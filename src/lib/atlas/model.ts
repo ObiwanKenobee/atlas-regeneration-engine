@@ -266,7 +266,7 @@ const COMPONENT_BY_ID = Object.fromEntries(DESIGN_COMPONENTS.map((c) => [c.id, c
 >;
 
 export function designTotals(items: DesignItem[], placeId: string): DesignTotals {
-  const place = PLACE_BY_ID[placeId] ?? PLACE_BY_ID["nairobi"];
+  const place = (PLACE_BY_ID[placeId] ?? PLACE_BY_ID["nairobi"]) as Place;
   const capitals: Record<CapitalId, number> = {
     financial: 0, human: 0, social: 0, natural: 0, knowledge: 0, technological: 0, cultural: 0,
   };
@@ -370,9 +370,9 @@ export function stackAnalysis(stack: CapitalStack, capexUsdM: number) {
   const total = Object.values(stack).reduce((a, b) => a + b, 0);
   const sources = CAPITAL_SOURCES.filter((s) => (stack[s.id] ?? 0) > 0);
   const norm = total === 0 ? 1 : total;
-  const blendedCost = sources.reduce((sum, s) => sum + (stack[s.id] / norm) * s.costOfCapital, 0);
-  const patience = sources.reduce((sum, s) => sum + (stack[s.id] / norm) * s.patience, 0);
-  const riskAppetite = sources.reduce((sum, s) => sum + (stack[s.id] / norm) * s.riskAppetite, 0);
+  const blendedCost = sources.reduce((sum, s) => sum + ((stack[s.id] ?? 0) / norm) * s.costOfCapital, 0);
+  const patience = sources.reduce((sum, s) => sum + ((stack[s.id] ?? 0) / norm) * s.patience, 0);
+  const riskAppetite = sources.reduce((sum, s) => sum + ((stack[s.id] ?? 0) / norm) * s.riskAppetite, 0);
   const feasibility = clamp(
     38 + (12 - blendedCost) * 4.2 + patience * 0.24 + riskAppetite * 0.22 - Math.abs(100 - total) * 0.8,
   );
