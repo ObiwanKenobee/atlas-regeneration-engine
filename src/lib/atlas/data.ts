@@ -159,16 +159,16 @@ export type Place = {
 };
 
 const ind = (v: number[]): Indicators => ({
-  capacity: v[0],
-  access: v[1],
-  affordability: v[2],
-  reliability: v[3],
-  resilience: v[4],
-  ecologicalIntegrity: v[5],
-  humanBenefit: v[6],
-  innovationCapacity: v[7],
-  capitalReadiness: v[8],
-  futureReadiness: v[9],
+  capacity: v[0] ?? 0,
+  access: v[1] ?? 0,
+  affordability: v[2] ?? 0,
+  reliability: v[3] ?? 0,
+  resilience: v[4] ?? 0,
+  ecologicalIntegrity: v[5] ?? 0,
+  humanBenefit: v[6] ?? 0,
+  innovationCapacity: v[7] ?? 0,
+  capitalReadiness: v[8] ?? 0,
+  futureReadiness: v[9] ?? 0,
 });
 
 const status = (
