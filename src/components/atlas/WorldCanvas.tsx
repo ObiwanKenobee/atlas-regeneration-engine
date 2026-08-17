@@ -13,6 +13,7 @@ export function WorldCanvas({
   onSelectPlace,
   zoom = 1,
   showAssets = true,
+  showLabels = true,
   className,
 }: {
   activeSystems: SystemId[];
@@ -20,6 +21,7 @@ export function WorldCanvas({
   onSelectPlace?: (p: Place) => void;
   zoom?: number;
   showAssets?: boolean;
+  showLabels?: boolean;
   className?: string;
 }) {
   const nodes = useMemo(
@@ -55,6 +57,8 @@ export function WorldCanvas({
       .filter(Boolean) as Array<{ from: (typeof nodes)[number]; to: (typeof nodes)[number]; id: string }>;
   }, [nodes]);
 
+  const focus = selectedPlaceId ? nodes.find((n) => n.place.id === selectedPlaceId) : undefined;
+
   return (
     <div className={`relative overflow-hidden rounded-lg border border-border bg-background ${className ?? ""}`}>
       <div className="grid-texture pointer-events-none absolute inset-0 opacity-70" />
@@ -69,7 +73,11 @@ export function WorldCanvas({
         viewBox="0 0 100 56"
         preserveAspectRatio="xMidYMid slice"
         className="relative h-full w-full"
-        style={{ transform: `scale(${zoom})`, transformOrigin: "center", transition: "transform 700ms cubic-bezier(.2,.7,.3,1)" }}
+        style={{
+          transform: `scale(${zoom})`,
+          transformOrigin: focus ? `${focus.x}% ${focus.y}%` : "center",
+          transition: "transform 700ms cubic-bezier(.2,.7,.3,1)",
+        }}
       >
         <defs>
           <radialGradient id="node-glow">
@@ -148,7 +156,8 @@ export function WorldCanvas({
           ))}
 
         {/* place nodes */}
-        {nodes.map(({ place, x, y }) => {
+        {nodes.map(({ place, x, y }, idx) => {
+          const labelDy = idx % 2 === 0 ? 0.8 : -2.2;
           const score = rici(place.indicators);
           const band = riciBand(score);
           const selected = place.id === selectedPlaceId;
@@ -178,9 +187,10 @@ export function WorldCanvas({
                 opacity={selected ? 0.9 : 0.4}
                 style={selected ? { animation: "atlas-pulse 2.4s ease-in-out infinite" } : undefined}
               />
+              {showLabels && (
               <text
                 x={x + 3}
-                y={y + 0.8}
+                y={y + labelDy}
                 fontSize="1.7"
                 fill="var(--foreground)"
                 opacity={selected ? 1 : 0.68}
@@ -188,9 +198,11 @@ export function WorldCanvas({
               >
                 {place.name.toUpperCase()}
               </text>
+              )}
+              {showLabels && (
               <text
                 x={x + 3}
-                y={y + 3}
+                y={y + labelDy + 2.2}
                 fontSize="1.3"
                 fill={band.color}
                 opacity="0.85"
@@ -198,6 +210,7 @@ export function WorldCanvas({
               >
                 RICI {score.toFixed(1)}
               </text>
+              )}
             </g>
           );
         })}

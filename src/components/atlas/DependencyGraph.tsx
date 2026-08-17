@@ -8,7 +8,7 @@ export function DependencyGraph({ asset }: { asset: Asset }) {
   const size = 420;
   const cx = size / 2;
   const cy = size / 2;
-  const r = size / 2 - 62;
+  const r = size / 2 - 96;
 
   return (
     <div>
