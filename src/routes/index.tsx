@@ -49,6 +49,7 @@ function Home() {
       <div className="relative">
         <WorldCanvas
           activeSystems={SYSTEMS.map((s) => s.id)}
+          showLabels={false}
           className="h-[58vh] min-h-[420px] w-full"
         />
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
@@ -63,7 +64,7 @@ function Home() {
             onSubmit={(e) => {
               e.preventDefault();
               const hit = matches[0];
-              void navigate({ to: "/explore", search: hit ? { place: hit.id } : undefined });
+              void navigate({ to: "/explore", search: hit ? { place: hit.id } : {} });
             }}
           >
             <input
