@@ -63,7 +63,7 @@ function Home() {
             onSubmit={(e) => {
               e.preventDefault();
               const hit = matches[0];
-              void navigate({ to: "/explore", search: hit ? { place: hit.id } : undefined });
+              void navigate({ to: "/explore", search: hit ? { place: hit.id } : {} });
             }}
           >
             <input

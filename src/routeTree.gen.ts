@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as CapitalRouteImport } from './routes/capital'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as ObserveRouteImport } from './routes/observe'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SimulateRouteImport } from './routes/simulate'
@@ -20,6 +22,11 @@ import { Route as SimulateRouteImport } from './routes/simulate'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtlasRoute = AtlasRouteImport.update({
+  id: '/atlas',
+  path: '/atlas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CapitalRoute = CapitalRouteImport.update({
@@ -35,6 +42,11 @@ const DesignRoute = DesignRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObserveRoute = ObserveRouteImport.update({
@@ -55,18 +67,22 @@ const SimulateRoute = SimulateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
   '/explore': typeof ExploreRoute
+  '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
   '/projects': typeof ProjectsRoute
   '/simulate': typeof SimulateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
   '/explore': typeof ExploreRoute
+  '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
   '/projects': typeof ProjectsRoute
   '/simulate': typeof SimulateRoute
@@ -74,9 +90,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
   '/explore': typeof ExploreRoute
+  '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
   '/projects': typeof ProjectsRoute
   '/simulate': typeof SimulateRoute
@@ -85,27 +103,33 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atlas'
     | '/capital'
     | '/design'
     | '/explore'
+    | '/impact'
     | '/observe'
     | '/projects'
     | '/simulate'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atlas'
     | '/capital'
     | '/design'
     | '/explore'
+    | '/impact'
     | '/observe'
     | '/projects'
     | '/simulate'
   id:
     | '__root__'
     | '/'
+    | '/atlas'
     | '/capital'
     | '/design'
     | '/explore'
+    | '/impact'
     | '/observe'
     | '/projects'
     | '/simulate'
@@ -113,9 +137,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtlasRoute: typeof AtlasRoute
   CapitalRoute: typeof CapitalRoute
   DesignRoute: typeof DesignRoute
   ExploreRoute: typeof ExploreRoute
+  ImpactRoute: typeof ImpactRoute
   ObserveRoute: typeof ObserveRoute
   ProjectsRoute: typeof ProjectsRoute
   SimulateRoute: typeof SimulateRoute
@@ -128,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atlas': {
+      id: '/atlas'
+      path: '/atlas'
+      fullPath: '/atlas'
+      preLoaderRoute: typeof AtlasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/capital': {
@@ -149,6 +182,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/observe': {
@@ -177,9 +217,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtlasRoute: AtlasRoute,
   CapitalRoute: CapitalRoute,
   DesignRoute: DesignRoute,
   ExploreRoute: ExploreRoute,
+  ImpactRoute: ImpactRoute,
   ObserveRoute: ObserveRoute,
   ProjectsRoute: ProjectsRoute,
   SimulateRoute: SimulateRoute,

@@ -77,16 +77,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Atlas Sanctum — Regenerative Infrastructure Intelligence" },
+      {
+        name: "description",
+        content:
+          "A living observatory for infrastructure systems: explore, simulate, design, finance and measure regenerative infrastructure.",
+      },
+      { name: "author", content: "Atlas Sanctum" },
+      { property: "og:title", content: "Atlas Sanctum — Regenerative Infrastructure Intelligence" },
+      {
+        property: "og:description",
+        content: "What future do we want to make possible—and what infrastructure would make it real?",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
