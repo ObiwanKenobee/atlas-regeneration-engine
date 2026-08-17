@@ -16,8 +16,8 @@ export function DependencyGraph({ asset }: { asset: Asset }) {
         <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[460px]">
           {deps.map((d, i) => {
             const a = (Math.PI * 2 * i) / deps.length - Math.PI / 2;
-            const x = cx + Math.cos(a) * r;
-            const y = cy + Math.sin(a) * r;
+            const x = Math.round((cx + Math.cos(a) * r) * 100) / 100;
+            const y = Math.round((cy + Math.sin(a) * r) * 100) / 100;
             const color = SYSTEM_BY_ID[d.system].colorVar;
             const broken = failed === d.label;
             const crit = stress ? Math.min(100, d.criticality * 1.25) : d.criticality;
@@ -29,12 +29,12 @@ export function DependencyGraph({ asset }: { asset: Asset }) {
                   x2={x}
                   y2={y}
                   stroke={broken ? "var(--danger)" : color}
-                  strokeWidth={broken ? 2.4 : 0.6 + crit / 55}
+                  strokeWidth={broken ? 2.4 : Math.round((0.6 + crit / 55) * 100) / 100}
                   strokeOpacity={broken ? 0.95 : 0.55}
                   strokeDasharray="4 6"
-                  style={{ animation: `atlas-dash ${broken ? 2 : 12 - crit / 12}s linear infinite` }}
+                  style={{ animation: `atlas-dash ${broken ? 2 : Math.round((12 - crit / 12) * 100) / 100}s linear infinite` }}
                 />
-                <circle cx={x} cy={y} r={5 + crit / 26} fill={broken ? "var(--danger)" : color} fillOpacity="0.9" />
+                <circle cx={x} cy={y} r={Math.round((5 + crit / 26) * 100) / 100} fill={broken ? "var(--danger)" : color} fillOpacity="0.9" />
                 <text
                   x={x + (x > cx ? 10 : -10)}
                   y={y + 3}
