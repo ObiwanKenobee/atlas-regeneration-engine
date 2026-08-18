@@ -4,10 +4,12 @@ import { z } from "zod";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
 import { DependencyGraph } from "@/components/atlas/DependencyGraph";
-import { ActionButton, Chip, Meter, Panel, ProvenanceTag, Stat } from "@/components/atlas/ui";
+import { ActionButton, Chip, FactList, Meter, Panel, ProvenanceTag, Stat } from "@/components/atlas/ui";
 import {
   ASSETS,
+  FACT_BASIS_NOTE,
   OPPORTUNITIES,
+  PLACE_FACTS,
   PLACE_BY_ID,
   PLACES,
   SYSTEMS,
@@ -208,6 +210,10 @@ function Explore() {
               source={place.provenance.source}
               year={place.provenance.year}
             />
+          </Panel>
+
+          <Panel label="Verified statistics">
+            <FactList facts={PLACE_FACTS[place.id] ?? []} note={FACT_BASIS_NOTE} />
           </Panel>
 
           <Panel label="System status">

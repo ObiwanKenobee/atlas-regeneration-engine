@@ -239,3 +239,71 @@ export function SectionTitle({ kicker, title, sub }: { kicker?: string; title: s
     </div>
   );
 }
+
+export function BasisChip({ basis }: { basis: "Reported" | "Estimated" | "Modeled" }) {
+  const color =
+    basis === "Reported"
+      ? "var(--accent)"
+      : basis === "Estimated"
+        ? "var(--signal-energy)"
+        : "var(--signal-compute)";
+  return (
+    <span
+      className="label-xs shrink-0 rounded-sm border px-1.5 py-0.5 text-[9px]"
+      style={{ color, borderColor: color, opacity: 0.9 }}
+      title={
+        basis === "Reported"
+          ? "Published by the named source"
+          : basis === "Estimated"
+            ? "Atlas estimate from partial public data"
+            : "Model output, not a measurement"
+      }
+    >
+      {basis}
+    </span>
+  );
+}
+
+export function FactList({
+  facts,
+  note,
+}: {
+  facts: Array<{
+    label: string;
+    value: string;
+    note?: string;
+    basis: "Reported" | "Estimated" | "Modeled";
+    source: string;
+    year: number;
+  }>;
+  note?: string;
+}) {
+  if (facts.length === 0) {
+    return (
+      <p className="text-[12px] text-muted-foreground">
+        No verified statistics are published for this geography yet. Atlas shows nothing rather than
+        inventing a number.
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {facts.map((f) => (
+        <div key={f.label} className="border-b border-border pb-2.5 last:border-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="label-xs">{f.label}</div>
+              <div className="num mt-0.5 text-[15px] text-foreground">{f.value}</div>
+            </div>
+            <BasisChip basis={f.basis} />
+          </div>
+          {f.note && <div className="mt-1 text-[11px] text-muted-foreground">{f.note}</div>}
+          <div className="label-xs mt-1 text-[9px] text-muted-foreground">
+            {f.source} · {f.year}
+          </div>
+        </div>
+      ))}
+      {note && <p className="text-[10px] leading-relaxed text-muted-foreground">{note}</p>}
+    </div>
+  );
+}
