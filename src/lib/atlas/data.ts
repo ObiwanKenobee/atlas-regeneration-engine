@@ -945,3 +945,99 @@ export const SEARCH_SUGGESTIONS = [
   "Food Systems",
   "Climate Resilience",
 ];
+
+// ---------------------------------------------------------------------------
+// Verified regional statistics.
+// Every row carries an explicit basis so the interface never presents a
+// modelled or estimated figure as an observation.
+//   Reported  — published by the named statutory / official source
+//   Estimated — Atlas estimate from partial public data
+//   Modeled   — output of a model, not a measurement
+// ---------------------------------------------------------------------------
+
+export type FactBasis = "Reported" | "Estimated" | "Modeled";
+
+export type PlaceFact = {
+  label: string;
+  value: string;
+  note?: string;
+  basis: FactBasis;
+  source: string;
+  year: number;
+};
+
+export const PLACE_FACTS: Record<string, PlaceFact[]> = {
+  world: [
+    { label: "Electricity generation", value: "~30,900 TWh", basis: "Reported", source: "IEA Electricity 2025", year: 2024 },
+    { label: "Data-centre electricity use", value: "~415 TWh", note: "≈1.5% of global demand", basis: "Reported", source: "IEA Energy & AI", year: 2024 },
+    { label: "Renewable capacity added", value: "+585 GW", basis: "Reported", source: "IRENA Renewable Capacity Statistics", year: 2024 },
+    { label: "People without electricity", value: "~685 million", basis: "Reported", source: "IEA / World Bank SDG7 Tracking", year: 2022 },
+    { label: "Annual infrastructure investment gap", value: "~$0.4 trillion/yr", note: "to meet 2040 need", basis: "Modeled", source: "Global Infrastructure Outlook (GIH)", year: 2023 },
+  ],
+  africa: [
+    { label: "People without electricity", value: "~600 million", basis: "Reported", source: "IEA Africa Energy Outlook", year: 2024 },
+    { label: "Installed generation capacity", value: "~260 GW", note: "continent-wide, all fuels", basis: "Estimated", source: "Atlas from IRENA + IEA country data", year: 2024 },
+    { label: "Share of global energy investment", value: "~2%", basis: "Reported", source: "IEA World Energy Investment", year: 2024 },
+    { label: "Colocation data-centre capacity", value: "~250–300 MW IT", note: "≈1% of global stock", basis: "Estimated", source: "Atlas from operator disclosures", year: 2024 },
+    { label: "Solar technical potential", value: ">7,900 GW", basis: "Modeled", source: "IEA / IRENA resource assessment", year: 2022 },
+  ],
+  kenya: [
+    { label: "Installed grid capacity", value: "3,243 MW", basis: "Reported", source: "EPRA Energy & Petroleum Statistics Report", year: 2024 },
+    { label: "Geothermal capacity", value: "~985 MW", note: "Olkaria complex dominant", basis: "Reported", source: "EPRA / KenGen", year: 2024 },
+    { label: "Renewable share of generation", value: "~90%", basis: "Reported", source: "EPRA", year: 2024 },
+    { label: "System losses (T&D)", value: "~22–23%", basis: "Reported", source: "Kenya Power annual report", year: 2024 },
+    { label: "Electricity access", value: "~75%", note: "grid + off-grid solar", basis: "Estimated", source: "Atlas from World Bank / MoE data", year: 2023 },
+  ],
+  nairobi: [
+    { label: "Water demand vs supply", value: "810,000 vs ~525,000 m³/d", note: "≈35% structural deficit", basis: "Estimated", source: "Atlas from NCWSC / Athi Water figures", year: 2023 },
+    { label: "Metro population", value: "~5.6 million", note: "county census 4.4M (2019) + metro districts", basis: "Estimated", source: "Atlas from KNBS Census", year: 2024 },
+    { label: "Non-revenue water", value: "~45%", basis: "Reported", source: "WASREB Impact Report", year: 2023 },
+    { label: "Data-centre capacity", value: "~30–40 MW IT", note: "operational colocation", basis: "Estimated", source: "Atlas from operator disclosures", year: 2025 },
+  ],
+  "west-kenya": [
+    { label: "Annual rainfall", value: "1,200–2,000 mm", basis: "Reported", source: "Kenya Meteorological Department", year: 2023 },
+    { label: "Maize yield", value: "~1.8 t/ha", note: "agronomic potential ~6 t/ha", basis: "Reported", source: "FAOSTAT / MoALD", year: 2023 },
+    { label: "Post-harvest loss", value: "~20–30%", note: "cold chain and storage gap", basis: "Estimated", source: "Atlas from FAO loss studies", year: 2022 },
+    { label: "Electricity access", value: "~55–65%", note: "county variance is wide", basis: "Estimated", source: "Atlas from KNBS county data", year: 2023 },
+  ],
+  "east-africa": [
+    { label: "Ethiopia–Kenya HVDC link", value: "2,000 MW / 500 kV", note: "commissioned 2022", basis: "Reported", source: "World Bank / KETRACO", year: 2023 },
+    { label: "GERD installed capacity", value: "5,150 MW", basis: "Reported", source: "Ethiopian Electric Power", year: 2024 },
+    { label: "Regional electricity access", value: "~45%", basis: "Estimated", source: "Atlas from IEA / World Bank country data", year: 2023 },
+    { label: "Cross-border traded power", value: "<3% of regional demand", basis: "Estimated", source: "Atlas from EAPP reporting", year: 2023 },
+  ],
+  lagos: [
+    { label: "Nigeria grid capacity", value: "13 GW installed / ~4.5 GW available", basis: "Reported", source: "NERC quarterly reports", year: 2024 },
+    { label: "Self-generation (gensets)", value: "~14 GW", note: "largest 'utility' in the country", basis: "Estimated", source: "Atlas from NESP / industry studies", year: 2023 },
+    { label: "Metro population", value: "~16–17 million", note: "census figures disputed", basis: "Estimated", source: "Atlas from UN-Habitat / NBS", year: 2024 },
+    { label: "Land <2 m above sea level", value: "~20% of metro area", basis: "Modeled", source: "Climate Central coastal elevation model", year: 2021 },
+  ],
+  india: [
+    { label: "Installed generation capacity", value: "~475 GW", basis: "Reported", source: "Central Electricity Authority", year: 2025 },
+    { label: "Non-fossil capacity", value: "~230 GW", note: "≈48% of installed base", basis: "Reported", source: "Central Electricity Authority / MNRE", year: 2025 },
+    { label: "Solar capacity", value: "~105 GW", basis: "Reported", source: "MNRE", year: 2025 },
+    { label: "Data-centre capacity", value: "~1.3 GW IT", note: "fastest-growing large market", basis: "Estimated", source: "Atlas from operator disclosures", year: 2025 },
+    { label: "Groundwater extraction", value: "~245 km³/yr", note: "world's largest", basis: "Reported", source: "Central Ground Water Board", year: 2023 },
+  ],
+  nordics: [
+    { label: "Nordic electricity generation", value: "~415 TWh", basis: "Reported", source: "Nord Pool / national TSOs", year: 2024 },
+    { label: "Grid carbon intensity", value: "~30–60 gCO₂/kWh", basis: "Reported", source: "ENTSO-E / national TSOs", year: 2024 },
+    { label: "Norway hydro share", value: "~88% of generation", basis: "Reported", source: "Statistics Norway", year: 2024 },
+    { label: "Data-centre load growth", value: "+15–20%/yr", basis: "Estimated", source: "Atlas from TSO connection queues", year: 2024 },
+  ],
+  "sao-paulo": [
+    { label: "Brazil renewable electricity share", value: "~88%", basis: "Reported", source: "EPE Balanço Energético Nacional", year: 2024 },
+    { label: "Metro population", value: "~21.9 million", basis: "Reported", source: "IBGE Census", year: 2022 },
+    { label: "Sewage treated", value: "~62% nationally", note: "metro coverage higher", basis: "Reported", source: "SNIS / Instituto Trata Brasil", year: 2023 },
+    { label: "Cantareira reservoir volatility", value: "30–90% storage swing", note: "within a single decade", basis: "Reported", source: "SABESP operating records", year: 2024 },
+  ],
+  texas: [
+    { label: "ERCOT peak demand record", value: "85.5 GW", note: "August 2023", basis: "Reported", source: "ERCOT", year: 2023 },
+    { label: "Utility-scale solar", value: "~30 GW", basis: "Reported", source: "ERCOT capacity reports", year: 2025 },
+    { label: "Battery storage", value: "~12 GW", basis: "Reported", source: "ERCOT capacity reports", year: 2025 },
+    { label: "Large-load interconnection requests", value: ">100 GW", note: "mostly data centres; few will be built", basis: "Reported", source: "ERCOT large load queue", year: 2025 },
+  ],
+};
+
+export const FACT_BASIS_NOTE =
+  "Reported = published by the named source. Estimated = Atlas estimate from partial public data. Modeled = model output, not a measurement.";
