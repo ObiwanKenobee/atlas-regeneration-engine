@@ -35,7 +35,7 @@ const TWIN_QUESTIONS = [
 ];
 
 function Projects() {
-  const [generated, setGenerated] = useState<string | null>(null);
+  const [generated, setGenerated] = useState<string | null>(OPPORTUNITIES[0]!.id);
   const [twin, setTwin] = useState<number | null>(null);
   const [oppId, setOppId] = useState(OPPORTUNITIES[0]!.id);
   const opp = OPPORTUNITIES.find((o) => o.id === oppId)!;

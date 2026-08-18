@@ -33,7 +33,12 @@ function DesignStudio() {
   const search = Route.useSearch();
   const [placeId, setPlaceId] = useState(search.place ?? "nairobi");
   const [selected, setSelected] = useState(DESIGN_COMPONENTS[0]!.id);
-  const [items, setItems] = useState<DesignItem[]>([]);
+  const [items, setItems] = useState<DesignItem[]>(() => [
+    { id: "seed-solar", componentId: "solar", count: 4, x: 26, y: 32 },
+    { id: "seed-battery", componentId: "battery", count: 3, x: 45, y: 55 },
+    { id: "seed-water", componentId: "water-treatment", count: 1, x: 68, y: 40 },
+    { id: "seed-datacenter", componentId: "datacenter", count: 1, x: 55, y: 22 },
+  ]);
 
   const place = PLACE_BY_ID[placeId] ?? PLACES[0]!;
   const totals = useMemo(() => designTotals(items, placeId), [items, placeId]);
