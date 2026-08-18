@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { ActionButton, Chip, Meter, Panel, ProvenanceTag, SectionTitle, Slider, Stat } from "@/components/atlas/ui";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/atlas/model";
 
 export const Route = createFileRoute("/simulate")({
+  validateSearch: z.object({ place: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "Simulate — Alternative Infrastructure Futures | Atlas Sanctum" },
@@ -35,7 +37,8 @@ export const Route = createFileRoute("/simulate")({
 type Saved = { name: string; placeId: string; vars: ScenarioVars };
 
 function Simulate() {
-  const [placeId, setPlaceId] = useState("nairobi");
+  const search = Route.useSearch();
+  const [placeId, setPlaceId] = useState(search.place ?? "nairobi");
   const [vars, setVars] = useState<ScenarioVars>(DEFAULT_VARS);
   const [preset, setPreset] = useState<string | null>(null);
   const [saved, setSaved] = useState<Saved[]>([]);
@@ -203,7 +206,7 @@ function Simulate() {
                   construction, operations and maintenance.
                 </li>
               </ul>
-              <Link to="/design">
+              <Link to="/design" search={{ place: placeId }}>
                 <ActionButton className="mt-4 w-full">DESIGN THIS FUTURE</ActionButton>
               </Link>
             </Panel>

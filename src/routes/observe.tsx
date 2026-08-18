@@ -1,8 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
-import { Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
-import { GRAPH_EDGES, GRAPH_NODES, PLACES, RADAR_FRONTIERS, SYSTEMS } from "@/lib/atlas/data";
+import { FactList, Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
+import {
+  FACT_BASIS_NOTE,
+  GRAPH_EDGES,
+  GRAPH_NODES,
+  PLACES,
+  PLACE_FACTS,
+  RADAR_FRONTIERS,
+  SYSTEMS,
+} from "@/lib/atlas/data";
 import { RICI_WEIGHTS, rici, riciBand } from "@/lib/atlas/model";
 
 export const Route = createFileRoute("/observe")({
@@ -70,6 +78,13 @@ function Observe() {
           />
         </Panel>
       </div>
+
+      <Panel className="mt-4" label="Planetary statistics · what is actually measured">
+        <div className="grid gap-x-8 gap-y-0 md:grid-cols-2 xl:grid-cols-3">
+          <FactList facts={PLACE_FACTS["world"] ?? []} />
+        </div>
+        <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">{FACT_BASIS_NOTE}</p>
+      </Panel>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <Panel label="Planetary system status">

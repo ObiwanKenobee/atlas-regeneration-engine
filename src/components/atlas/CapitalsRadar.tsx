@@ -11,7 +11,7 @@ export function CapitalsRadar({
 }) {
   const cx = size / 2;
   const cy = size / 2;
-  const r = size / 2 - 34;
+  const r = size / 2 - 48;
   const n = SEVEN_CAPITALS.length;
 
   const point = (i: number, v: number) => {
@@ -52,8 +52,8 @@ export function CapitalsRadar({
       {SEVEN_CAPITALS.map((c, i) => {
         const [x, y] = point(i, 100);
         const [px, py] = point(i, values[c.id]);
-        const lx = cx + (x - cx) * 1.17;
-        const ly = cy + (y - cy) * 1.17;
+        const lx = cx + (x - cx) * 1.14;
+        const ly = cy + (y - cy) * 1.14;
         return (
           <g key={`l-${c.id}`}>
             <circle cx={px} cy={py} r="2.5" fill="var(--primary)" />
