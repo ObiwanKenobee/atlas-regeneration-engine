@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { CapitalsRadar } from "@/components/atlas/CapitalsRadar";
@@ -7,6 +8,7 @@ import { DESIGN_COMPONENTS, PLACES, PLACE_BY_ID, SEVEN_CAPITALS, SYSTEM_BY_ID } 
 import { designTotals, fmtNum, fmtUsdM, integrityAssessment, type DesignItem } from "@/lib/atlas/model";
 
 export const Route = createFileRoute("/design")({
+  validateSearch: z.object({ place: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "Design Studio — Infrastructure Interventions | Atlas Sanctum" },
@@ -28,7 +30,8 @@ export const Route = createFileRoute("/design")({
 });
 
 function DesignStudio() {
-  const [placeId, setPlaceId] = useState("nairobi");
+  const search = Route.useSearch();
+  const [placeId, setPlaceId] = useState(search.place ?? "nairobi");
   const [selected, setSelected] = useState(DESIGN_COMPONENTS[0]!.id);
   const [items, setItems] = useState<DesignItem[]>([]);
 

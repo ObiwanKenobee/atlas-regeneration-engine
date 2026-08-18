@@ -249,6 +249,16 @@ function Explore() {
             <ActionButton className="mt-4 w-full" onClick={() => setShowOpps(true)}>
               FIND OPPORTUNITIES
             </ActionButton>
+            <Link to="/simulate" search={{ place: place.id }} className="mt-2 block">
+              <ActionButton variant="ghost" className="w-full">
+                SIMULATE THE FUTURE
+              </ActionButton>
+            </Link>
+            <Link to="/design" search={{ place: place.id }} className="mt-2 block">
+              <ActionButton variant="ghost" className="w-full">
+                DESIGN THIS FUTURE
+              </ActionButton>
+            </Link>
           </Panel>
         </aside>
       </div>
@@ -294,7 +304,7 @@ function Explore() {
                   <Q label="What could prevent it?" body={o.whatCouldPrevent.join(" · ")} />
                 </div>
                 <div className="mt-4 flex gap-2">
-                  <Link to="/design" className="flex-1">
+                  <Link to="/design" search={{ place: o.placeId }} className="flex-1">
                     <ActionButton className="w-full" variant="ghost">
                       DESIGN THIS
                     </ActionButton>
