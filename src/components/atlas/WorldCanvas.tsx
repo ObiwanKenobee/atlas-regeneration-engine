@@ -4,7 +4,7 @@ import { rici, riciBand } from "@/lib/atlas/model";
 
 const project = (lat: number, lon: number) => ({
   x: ((lon + 180) / 360) * 100,
-  y: ((78 - lat) / 156) * 100,
+  y: ((78 - lat) / 156) * 56,
 });
 
 export function WorldCanvas({
@@ -24,10 +24,17 @@ export function WorldCanvas({
   showLabels?: boolean;
   className?: string;
 }) {
-  const nodes = useMemo(
-    () => PLACES.filter((p) => p.id !== "world").map((p) => ({ place: p, ...project(p.lat, p.lon) })),
-    [],
-  );
+  const nodes = useMemo(() => {
+    const seen = new Map<string, number>();
+    return PLACES.filter((p) => p.id !== "world").map((p) => {
+      const base = project(p.lat, p.lon);
+      const key = `${Math.round(base.x / 4)}:${Math.round(base.y / 4)}`;
+      const n = seen.get(key) ?? 0;
+      seen.set(key, n + 1);
+      // fan out co-located places so labels stay legible
+      return { place: p, x: base.x + n * 1.0, y: base.y + n * 1.8 };
+    });
+  }, []);
   const assets = useMemo(
     () =>
       ASSETS.filter((a) => activeSystems.length === 0 || activeSystems.includes(a.system)).map(
@@ -57,6 +64,20 @@ export function WorldCanvas({
       .filter(Boolean) as Array<{ from: (typeof nodes)[number]; to: (typeof nodes)[number]; id: string }>;
   }, [nodes]);
 
+  const labelled = useMemo(() => {
+    const ok = new Set<string>();
+    const taken: Array<{ x: number; y: number }> = [];
+    const ordered = [...nodes].sort((a, b) =>
+      (b.place.id === selectedPlaceId ? 1 : 0) - (a.place.id === selectedPlaceId ? 1 : 0),
+    );
+    for (const n of ordered) {
+      if (taken.some((t) => Math.abs(t.x - n.x) < 22 && Math.abs(t.y - n.y) < 5)) continue;
+      taken.push({ x: n.x, y: n.y });
+      ok.add(n.place.id);
+    }
+    return ok;
+  }, [nodes, selectedPlaceId]);
+
   const focus = selectedPlaceId ? nodes.find((n) => n.place.id === selectedPlaceId) : undefined;
 
   return (
@@ -73,12 +94,15 @@ export function WorldCanvas({
         viewBox="0 0 100 56"
         preserveAspectRatio="xMidYMid slice"
         className="relative h-full w-full"
-        style={{
-          transform: `scale(${zoom})`,
-          transformOrigin: focus ? `${focus.x}% ${focus.y}%` : "center",
-          transition: "transform 700ms cubic-bezier(.2,.7,.3,1)",
-        }}
       >
+        <g
+          transform={
+            focus
+              ? `translate(${(50 - focus.x * zoom).toFixed(2)} ${(28 - focus.y * zoom).toFixed(2)}) scale(${zoom})`
+              : `translate(${(50 - 50 * zoom).toFixed(2)} ${(28 - 28 * zoom).toFixed(2)}) scale(${zoom})`
+          }
+          style={{ transition: "transform 700ms cubic-bezier(.2,.7,.3,1)" }}
+        >
         <defs>
           <radialGradient id="node-glow">
             <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.55" />
@@ -157,7 +181,7 @@ export function WorldCanvas({
 
         {/* place nodes */}
         {nodes.map(({ place, x, y }, idx) => {
-          const labelDy = idx % 2 === 0 ? 0.8 : -2.2;
+          const labelDy = (idx % 2 === 0 ? 1.0 : -2.4) / zoom;
           const score = rici(place.indicators);
           const band = riciBand(score);
           const selected = place.id === selectedPlaceId;
@@ -169,29 +193,29 @@ export function WorldCanvas({
               role="button"
               aria-label={place.name}
             >
-              <circle cx={x} cy={y} r={selected ? 6 : 4} fill="url(#node-glow)" />
+              <circle cx={x} cy={y} r={(selected ? 6 : 4) / zoom} fill="url(#node-glow)" />
               <circle
                 cx={x}
                 cy={y}
-                r={selected ? 1.5 : 1}
+                r={(selected ? 1.5 : 1) / zoom}
                 fill={band.color}
                 style={{ filter: `drop-shadow(0 0 2px ${band.color})` }}
               />
               <circle
                 cx={x}
                 cy={y}
-                r="2.2"
+                r={2.2 / zoom}
                 fill="none"
                 stroke={band.color}
-                strokeWidth="0.12"
+                strokeWidth={0.12 / zoom}
                 opacity={selected ? 0.9 : 0.4}
                 style={selected ? { animation: "atlas-pulse 2.4s ease-in-out infinite" } : undefined}
               />
-              {showLabels && (
+              {showLabels && labelled.has(place.id) && (
               <text
-                x={x + 3}
+                x={x + 3 / zoom}
                 y={y + labelDy}
-                fontSize="1.7"
+                fontSize={1.7 / zoom}
                 fill="var(--foreground)"
                 opacity={selected ? 1 : 0.68}
                 style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.04em" }}
@@ -199,11 +223,11 @@ export function WorldCanvas({
                 {place.name.toUpperCase()}
               </text>
               )}
-              {showLabels && (
+              {showLabels && labelled.has(place.id) && (
               <text
-                x={x + 3}
-                y={y + labelDy + 2.2}
-                fontSize="1.3"
+                x={x + 3 / zoom}
+                y={y + labelDy + 2.2 / zoom}
+                fontSize={1.3 / zoom}
                 fill={band.color}
                 opacity="0.85"
                 style={{ fontFamily: "var(--font-mono)" }}
@@ -214,6 +238,7 @@ export function WorldCanvas({
             </g>
           );
         })}
+        </g>
       </svg>
 
       <div className="pointer-events-none absolute bottom-3 left-4 flex flex-wrap gap-3">

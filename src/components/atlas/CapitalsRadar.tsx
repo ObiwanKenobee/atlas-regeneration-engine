@@ -24,7 +24,12 @@ export function CapitalsRadar({
     SEVEN_CAPITALS.map((c, i) => point(i, vals[c.id]).join(",")).join(" ");
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto max-w-full">
+    <svg
+      width={size}
+      height={size}
+      viewBox={`${-44} 0 ${size + 88} ${size}`}
+      className="mx-auto max-w-full overflow-visible"
+    >
       {[25, 50, 75, 100].map((ring) => (
         <polygon
           key={ring}
