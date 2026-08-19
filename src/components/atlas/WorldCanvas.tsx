@@ -24,10 +24,17 @@ export function WorldCanvas({
   showLabels?: boolean;
   className?: string;
 }) {
-  const nodes = useMemo(
-    () => PLACES.filter((p) => p.id !== "world").map((p) => ({ place: p, ...project(p.lat, p.lon) })),
-    [],
-  );
+  const nodes = useMemo(() => {
+    const seen = new Map<string, number>();
+    return PLACES.filter((p) => p.id !== "world").map((p) => {
+      const base = project(p.lat, p.lon);
+      const key = `${base.x.toFixed(0)}:${base.y.toFixed(0)}`;
+      const n = seen.get(key) ?? 0;
+      seen.set(key, n + 1);
+      // fan out co-located places so labels stay legible
+      return { place: p, x: base.x + n * 1.6, y: base.y + n * 2.6 };
+    });
+  }, []);
   const assets = useMemo(
     () =>
       ASSETS.filter((a) => activeSystems.length === 0 || activeSystems.includes(a.system)).map(
@@ -160,7 +167,7 @@ export function WorldCanvas({
 
         {/* place nodes */}
         {nodes.map(({ place, x, y }, idx) => {
-          const labelDy = (idx % 2 === 0 ? 0.8 : -2.2) / zoom;
+          const labelDy = (idx % 2 === 0 ? 1.0 : -2.4) / zoom;
           const score = rici(place.indicators);
           const band = riciBand(score);
           const selected = place.id === selectedPlaceId;
