@@ -32,7 +32,7 @@ export function WorldCanvas({
       const n = seen.get(key) ?? 0;
       seen.set(key, n + 1);
       // fan out co-located places so labels stay legible
-      return { place: p, x: base.x + n * 2.4, y: base.y + n * 4.4 };
+      return { place: p, x: base.x + n * 1.0, y: base.y + n * 1.8 };
     });
   }, []);
   const assets = useMemo(
