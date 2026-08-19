@@ -172,25 +172,25 @@ export function WorldCanvas({
               role="button"
               aria-label={place.name}
             >
-              <circle cx={x} cy={y} r={selected ? 6 : 4} fill="url(#node-glow)" />
+              <circle cx={x} cy={y} r={(selected ? 6 : 4) / zoom} fill="url(#node-glow)" />
               <circle
                 cx={x}
                 cy={y}
-                r={selected ? 1.5 : 1}
+                r={(selected ? 1.5 : 1) / zoom}
                 fill={band.color}
                 style={{ filter: `drop-shadow(0 0 2px ${band.color})` }}
               />
               <circle
                 cx={x}
                 cy={y}
-                r="2.2"
+                r={2.2 / zoom}
                 fill="none"
                 stroke={band.color}
-                strokeWidth="0.12"
+                strokeWidth={0.12 / zoom}
                 opacity={selected ? 0.9 : 0.4}
                 style={selected ? { animation: "atlas-pulse 2.4s ease-in-out infinite" } : undefined}
               />
-              {showLabels && (
+              {showLabels && (zoom < 2 || selected) && (
               <text
                 x={x + 3 / zoom}
                 y={y + labelDy}
@@ -202,7 +202,7 @@ export function WorldCanvas({
                 {place.name.toUpperCase()}
               </text>
               )}
-              {showLabels && (
+              {showLabels && (zoom < 2 || selected) && (
               <text
                 x={x + 3 / zoom}
                 y={y + labelDy + 2.2 / zoom}
