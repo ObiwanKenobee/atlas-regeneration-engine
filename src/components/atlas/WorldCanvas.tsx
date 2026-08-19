@@ -4,7 +4,7 @@ import { rici, riciBand } from "@/lib/atlas/model";
 
 const project = (lat: number, lon: number) => ({
   x: ((lon + 180) / 360) * 100,
-  y: ((78 - lat) / 156) * 100,
+  y: ((78 - lat) / 156) * 56,
 });
 
 export function WorldCanvas({
@@ -73,12 +73,15 @@ export function WorldCanvas({
         viewBox="0 0 100 56"
         preserveAspectRatio="xMidYMid slice"
         className="relative h-full w-full"
-        style={{
-          transform: `scale(${zoom})`,
-          transformOrigin: focus ? `${focus.x}% ${focus.y}%` : "center",
-          transition: "transform 700ms cubic-bezier(.2,.7,.3,1)",
-        }}
       >
+        <g
+          transform={
+            focus
+              ? `translate(${(50 - focus.x * zoom).toFixed(2)} ${(28 - focus.y * zoom).toFixed(2)}) scale(${zoom})`
+              : `translate(${(50 - 50 * zoom).toFixed(2)} ${(28 - 28 * zoom).toFixed(2)}) scale(${zoom})`
+          }
+          style={{ transition: "transform 700ms cubic-bezier(.2,.7,.3,1)" }}
+        >
         <defs>
           <radialGradient id="node-glow">
             <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.55" />
@@ -214,6 +217,7 @@ export function WorldCanvas({
             </g>
           );
         })}
+        </g>
       </svg>
 
       <div className="pointer-events-none absolute bottom-3 left-4 flex flex-wrap gap-3">
