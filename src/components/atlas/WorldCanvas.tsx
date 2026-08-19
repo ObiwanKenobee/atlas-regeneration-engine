@@ -28,11 +28,11 @@ export function WorldCanvas({
     const seen = new Map<string, number>();
     return PLACES.filter((p) => p.id !== "world").map((p) => {
       const base = project(p.lat, p.lon);
-      const key = `${base.x.toFixed(0)}:${base.y.toFixed(0)}`;
+      const key = `${Math.round(base.x / 4)}:${Math.round(base.y / 4)}`;
       const n = seen.get(key) ?? 0;
       seen.set(key, n + 1);
       // fan out co-located places so labels stay legible
-      return { place: p, x: base.x + n * 1.6, y: base.y + n * 2.6 };
+      return { place: p, x: base.x + n * 2.4, y: base.y + n * 4.4 };
     });
   }, []);
   const assets = useMemo(
