@@ -64,6 +64,20 @@ export function WorldCanvas({
       .filter(Boolean) as Array<{ from: (typeof nodes)[number]; to: (typeof nodes)[number]; id: string }>;
   }, [nodes]);
 
+  const labelled = useMemo(() => {
+    const ok = new Set<string>();
+    const taken: Array<{ x: number; y: number }> = [];
+    const ordered = [...nodes].sort((a, b) =>
+      (b.place.id === selectedPlaceId ? 1 : 0) - (a.place.id === selectedPlaceId ? 1 : 0),
+    );
+    for (const n of ordered) {
+      if (taken.some((t) => Math.abs(t.x - n.x) < 22 && Math.abs(t.y - n.y) < 5)) continue;
+      taken.push({ x: n.x, y: n.y });
+      ok.add(n.place.id);
+    }
+    return ok;
+  }, [nodes, selectedPlaceId]);
+
   const focus = selectedPlaceId ? nodes.find((n) => n.place.id === selectedPlaceId) : undefined;
 
   return (
@@ -197,7 +211,7 @@ export function WorldCanvas({
                 opacity={selected ? 0.9 : 0.4}
                 style={selected ? { animation: "atlas-pulse 2.4s ease-in-out infinite" } : undefined}
               />
-              {showLabels && (zoom < 2 || selected) && (
+              {showLabels && labelled.has(place.id) && (
               <text
                 x={x + 3 / zoom}
                 y={y + labelDy}
@@ -209,7 +223,7 @@ export function WorldCanvas({
                 {place.name.toUpperCase()}
               </text>
               )}
-              {showLabels && (zoom < 2 || selected) && (
+              {showLabels && labelled.has(place.id) && (
               <text
                 x={x + 3 / zoom}
                 y={y + labelDy + 2.2 / zoom}
