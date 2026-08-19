@@ -160,7 +160,7 @@ export function WorldCanvas({
 
         {/* place nodes */}
         {nodes.map(({ place, x, y }, idx) => {
-          const labelDy = idx % 2 === 0 ? 0.8 : -2.2;
+          const labelDy = (idx % 2 === 0 ? 0.8 : -2.2) / zoom;
           const score = rici(place.indicators);
           const band = riciBand(score);
           const selected = place.id === selectedPlaceId;
@@ -192,9 +192,9 @@ export function WorldCanvas({
               />
               {showLabels && (
               <text
-                x={x + 3}
+                x={x + 3 / zoom}
                 y={y + labelDy}
-                fontSize="1.7"
+                fontSize={1.7 / zoom}
                 fill="var(--foreground)"
                 opacity={selected ? 1 : 0.68}
                 style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.04em" }}
@@ -204,9 +204,9 @@ export function WorldCanvas({
               )}
               {showLabels && (
               <text
-                x={x + 3}
-                y={y + labelDy + 2.2}
-                fontSize="1.3"
+                x={x + 3 / zoom}
+                y={y + labelDy + 2.2 / zoom}
+                fontSize={1.3 / zoom}
                 fill={band.color}
                 opacity="0.85"
                 style={{ fontFamily: "var(--font-mono)" }}
