@@ -200,12 +200,14 @@ export function Stat({
   unit,
   hint,
   tone = "default",
+  cite,
 }: {
   label: string;
   value: string | number;
   unit?: string;
   hint?: string;
   tone?: "default" | "good" | "warn" | "danger" | "primary";
+  cite?: string;
 }) {
   const color =
     tone === "good"
@@ -217,13 +219,22 @@ export function Stat({
           : tone === "primary"
             ? "text-primary"
             : "text-foreground";
+  const p = cite ? provenanceFor(cite) : undefined;
   return (
     <div className="min-w-0">
-      <div className="label-xs truncate">{label}</div>
+      <div className="flex items-center gap-1.5">
+        <span className="label-xs truncate">{label}</span>
+        {cite && <MetricCite id={cite} />}
+      </div>
       <div className={cn("num mt-1 text-xl leading-none tracking-tight", color)}>
         {value}
         {unit && <span className="ml-1 text-[11px] text-muted-foreground">{unit}</span>}
       </div>
+      {p && (
+        <div className="mt-1">
+          <BasisFlag basis={p.basis} confidence={p.confidence} />
+        </div>
+      )}
       {hint && <div className="mt-1 text-[11px] leading-snug text-muted-foreground">{hint}</div>}
     </div>
   );
@@ -235,18 +246,23 @@ export function Meter({
   max = 100,
   color = "var(--primary)",
   suffix,
+  cite,
 }: {
   label: string;
   value: number;
   max?: number;
   color?: string;
   suffix?: string;
+  cite?: string;
 }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="label-xs">{label}</span>
+        <span className="label-xs flex items-center gap-1.5">
+          {label}
+          {cite && <MetricCite id={cite} />}
+        </span>
         <span className="num text-xs text-foreground">
           {value}
           {suffix ?? ""}
@@ -261,6 +277,7 @@ export function Meter({
     </div>
   );
 }
+
 
 export function Chip({
   children,
