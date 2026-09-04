@@ -428,3 +428,100 @@ export const fmtNum = (v: number) => {
   if (Math.abs(v) >= 1_000) return `${(v / 1_000).toFixed(0)}K`;
   return `${Math.round(v)}`;
 };
+
+// ---------------------------------------------------------------------------
+// Scenario comparison — run several futures side by side and surface where
+// they actually diverge.
+// ---------------------------------------------------------------------------
+
+export type ScenarioMetricMeta = {
+  key: keyof ScenarioOutput;
+  label: string;
+  unit: string;
+  /** Direction that counts as improvement. */
+  better: "lower" | "higher";
+  citeId: string;
+};
+
+export const SCENARIO_METRICS: ScenarioMetricMeta[] = [
+  { key: "energyDemandTwh", label: "Energy demand", unit: "TWh/yr", better: "lower", citeId: "sim.energyDemandTwh" },
+  { key: "computeLoadMw", label: "Compute load", unit: "MW", better: "higher", citeId: "sim.computeLoadMw" },
+  { key: "waterDemandMm3", label: "Water demand", unit: "Mm³/yr", better: "lower", citeId: "sim.waterDemandMm3" },
+  { key: "emissionsMtco2e", label: "Emissions", unit: "MtCO₂e", better: "lower", citeId: "sim.emissionsMtco2e" },
+  { key: "infrastructureGapUsdB", label: "Infrastructure gap", unit: "$B", better: "lower", citeId: "sim.infrastructureGapUsdB" },
+  { key: "capitalRequirementUsdB", label: "Capital requirement", unit: "$B", better: "lower", citeId: "sim.capitalRequirementUsdB" },
+  { key: "peopleWithAccessM", label: "People with access", unit: "M", better: "higher", citeId: "sim.peopleWithAccessM" },
+  { key: "economicActivityIndex", label: "Economic activity", unit: "index", better: "higher", citeId: "sim.economicActivityIndex" },
+  { key: "resilience", label: "Resilience", unit: "/100", better: "higher", citeId: "sim.resilience" },
+  { key: "ecosystemHealth", label: "Ecosystem health", unit: "/100", better: "higher", citeId: "sim.ecosystemHealth" },
+  { key: "ricIndex", label: "RICI", unit: "/100", better: "higher", citeId: "sim.ricIndex" },
+];
+
+export type ComparedScenario = { id: string; label: string; placeId: string; vars: ScenarioVars; out: ScenarioOutput };
+
+export type ComparisonRow = {
+  meta: ScenarioMetricMeta;
+  values: number[];
+  bestIndex: number;
+  worstIndex: number;
+  spreadPct: number;
+};
+
+export type Comparison = {
+  rows: ComparisonRow[];
+  /** Metrics where the scenarios diverge most — the real decisions. */
+  tradeoffs: Array<{ label: string; spreadPct: number; winner: string; loser: string; reading: string }>;
+  /** Per-scenario summary of what it buys and what it costs. */
+  impacts: Array<{ id: string; label: string; gains: string[]; costs: string[] }>;
+};
+
+export function compareScenarios(scenarios: ComparedScenario[]): Comparison {
+  if (scenarios.length === 0) return { rows: [], tradeoffs: [], impacts: [] };
+
+  const rows: ComparisonRow[] = SCENARIO_METRICS.map((meta) => {
+    const values = scenarios.map((s) => s.out[meta.key]);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const bestValue = meta.better === "higher" ? max : min;
+    const worstValue = meta.better === "higher" ? min : max;
+    const denom = Math.max(1e-6, Math.abs(max));
+    return {
+      meta,
+      values,
+      bestIndex: values.indexOf(bestValue),
+      worstIndex: values.indexOf(worstValue),
+      spreadPct: round(((max - min) / denom) * 100, 1),
+    };
+  });
+
+  const tradeoffs = [...rows]
+    .sort((a, b) => b.spreadPct - a.spreadPct)
+    .slice(0, 4)
+    .map((r) => ({
+      label: r.meta.label,
+      spreadPct: r.spreadPct,
+      winner: scenarios[r.bestIndex]?.label ?? "—",
+      loser: scenarios[r.worstIndex]?.label ?? "—",
+      reading: `${r.meta.label} varies ${r.spreadPct}% across these futures — ${scenarios[r.bestIndex]?.label} is the favourable end (${r.values[r.bestIndex]} ${r.meta.unit}), ${scenarios[r.worstIndex]?.label} the unfavourable one (${r.values[r.worstIndex]} ${r.meta.unit}).`,
+    }));
+
+  const impacts = scenarios.map((s, i) => {
+    const gains: string[] = [];
+    const costs: string[] = [];
+    rows.forEach((r) => {
+      const v = r.values[i]!;
+      const others = r.values.filter((_, j) => j !== i);
+      if (others.length === 0) return;
+      const mean = others.reduce((a, b) => a + b, 0) / others.length;
+      const diff = v - mean;
+      const rel = Math.abs(diff) / Math.max(1e-6, Math.abs(mean));
+      if (rel < 0.08) return;
+      const good = r.meta.better === "higher" ? diff > 0 : diff < 0;
+      const text = `${r.meta.label} ${diff > 0 ? "+" : ""}${round(diff, 1)} ${r.meta.unit} vs the other futures`;
+      (good ? gains : costs).push(text);
+    });
+    return { id: s.id, label: s.label, gains: gains.slice(0, 4), costs: costs.slice(0, 4) };
+  });
+
+  return { rows, tradeoffs, impacts };
+}
