@@ -1,16 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
-import { ActionButton, Chip, Meter, Panel, ProvenanceTag, SectionTitle, Slider, Stat } from "@/components/atlas/ui";
+import {
+  ActionButton,
+  Chip,
+  CitationPanel,
+  Meter,
+  Panel,
+  ProvenanceTag,
+  SectionTitle,
+  Slider,
+  Stat,
+} from "@/components/atlas/ui";
 import { PLACES, PLACE_BY_ID } from "@/lib/atlas/data";
+import { downloadReport, futureScenario } from "@/lib/atlas/report";
 import {
   DEFAULT_VARS,
+  SCENARIO_METRICS,
   SCENARIO_PRESETS,
   VAR_META,
+  compareScenarios,
   simulate,
+  type ComparedScenario,
   type ScenarioVars,
 } from "@/lib/atlas/model";
+
 
 export const Route = createFileRoute("/simulate")({
   validateSearch: z.object({ place: z.string().optional() }),
