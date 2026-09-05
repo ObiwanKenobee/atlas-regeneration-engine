@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
-import { ActionButton, Chip, Meter, Panel, ProvenanceTag, SectionTitle, Slider, Stat } from "@/components/atlas/ui";
+import { ActionButton, Chip, CitationPanel, Meter, Panel, ProvenanceTag, SectionTitle, Slider, Stat } from "@/components/atlas/ui";
 import { CAPITAL_SOURCES, OPPORTUNITIES, PLACE_BY_ID } from "@/lib/atlas/data";
 import { DEFAULT_STACK, fmtUsdM, stackAnalysis, type CapitalStack } from "@/lib/atlas/model";
+import { capitalStrategy, downloadReport } from "@/lib/atlas/report";
 
 export const Route = createFileRoute("/capital")({
   head: () => ({
@@ -41,6 +42,17 @@ function Capital() {
         sub="Capital is infrastructure too. Change the blend and watch feasibility, cost and patience move."
       />
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <ActionButton
+          variant="accent"
+          onClick={() =>
+            downloadReport(capitalStrategy(opp, PLACE_BY_ID[opp.placeId], stack, analysis))
+          }
+        >
+          EXPORT CAPITAL STRATEGY
+        </ActionButton>
+      </div>
+
       <div className="mb-4 flex flex-wrap gap-1.5">
         {OPPORTUNITIES.map((o) => (
           <Chip key={o.id} active={o.id === oppId} onClick={() => setOppId(o.id)}>
@@ -55,10 +67,10 @@ function Capital() {
             <h3 className="font-display text-xl tracking-tight">{opp.title}</h3>
             <p className="label-xs mt-0.5">{PLACE_BY_ID[opp.placeId]?.name}</p>
             <div className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-4">
-              <Stat label="Total capex" value={fmtUsdM(opp.capitalUsdM)} tone="primary" />
-              <Stat label="Blended cost" value={`${analysis.blendedCost}%`} tone={analysis.blendedCost < 8 ? "good" : "warn"} />
-              <Stat label="Annual service" value={fmtUsdM(analysis.annualDebtServiceUsdM)} />
-              <Stat label="Feasibility" value={analysis.feasibility} unit="/100" tone={analysis.feasibility > 60 ? "good" : "warn"} />
+              <Stat label="Total capex" value={fmtUsdM(opp.capitalUsdM)} tone="primary" cite="capital.capex" />
+              <Stat cite="capital.blendedCost" label="Blended cost" value={`${analysis.blendedCost}%`} tone={analysis.blendedCost < 8 ? "good" : "warn"} />
+              <Stat cite="capital.annualService" label="Annual service" value={fmtUsdM(analysis.annualDebtServiceUsdM)} />
+              <Stat cite="capital.feasibility" label="Feasibility" value={analysis.feasibility} unit="/100" tone={analysis.feasibility > 60 ? "good" : "warn"} />
             </div>
 
             <div className="mt-6 h-8 w-full overflow-hidden rounded-sm border border-border">
@@ -90,9 +102,9 @@ function Capital() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <Meter label="Patience" value={analysis.patience} color="var(--primary)" />
-              <Meter label="Risk appetite" value={analysis.riskAppetite} color="var(--accent)" />
-              <Meter label="Feasibility" value={analysis.feasibility} color="var(--good)" />
+              <Meter cite="capital.patience" label="Patience" value={analysis.patience} color="var(--primary)" />
+              <Meter cite="capital.riskAppetite" label="Risk appetite" value={analysis.riskAppetite} color="var(--accent)" />
+              <Meter cite="capital.feasibility" label="Feasibility" value={analysis.feasibility} color="var(--good)" />
             </div>
 
             {analysis.total !== 100 && (
@@ -122,6 +134,11 @@ function Capital() {
               ))}
             </div>
           </Panel>
+
+          <CitationPanel
+            ids={["capital.capex", "capital.blendedCost", "capital.annualService", "capital.feasibility", "capital.patience", "capital.riskAppetite"]}
+            title="Data provenance · capital metrics"
+          />
         </div>
 
         <aside className="space-y-3">

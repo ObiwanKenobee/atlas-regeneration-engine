@@ -3,9 +3,10 @@ import { z } from "zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { CapitalsRadar } from "@/components/atlas/CapitalsRadar";
-import { ActionButton, Chip, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
+import { ActionButton, Chip, CitationPanel, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
 import { DESIGN_COMPONENTS, PLACES, PLACE_BY_ID, SEVEN_CAPITALS, SYSTEM_BY_ID } from "@/lib/atlas/data";
 import { designTotals, fmtNum, fmtUsdM, integrityAssessment, type DesignItem } from "@/lib/atlas/model";
+import { downloadReport, infrastructureBlueprint } from "@/lib/atlas/report";
 
 export const Route = createFileRoute("/design")({
   validateSearch: z.object({ place: z.string().optional() }),
@@ -169,8 +170,9 @@ function DesignStudio() {
 
           <Panel label="Intervention totals">
             <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
-              <Stat label="Capital" value={fmtUsdM(totals.capexUsdM)} tone="primary" />
+              <Stat label="Capital" value={fmtUsdM(totals.capexUsdM)} tone="primary" cite="design.capex" />
               <Stat
+                cite="design.electricity"
                 label="Net electricity"
                 value={`${totals.netElectricityMw > 0 ? "+" : ""}${totals.netElectricityMw}`}
                 unit="MW"
@@ -178,20 +180,22 @@ function DesignStudio() {
                 hint={totals.netElectricityMw > 0 ? "net consumer" : "net generator"}
               />
               <Stat
+                cite="design.water"
                 label="Net water"
                 value={totals.waterM3d.toLocaleString()}
                 unit="m³/d"
                 tone={totals.waterM3d > 0 ? "warn" : "good"}
               />
-              <Stat label="Land" value={totals.landHa.toLocaleString()} unit="ha" />
-              <Stat label="Jobs" value={fmtNum(totals.jobs)} tone="good" />
+              <Stat label="Land" value={totals.landHa.toLocaleString()} unit="ha" cite="design.land" />
+              <Stat label="Jobs" value={fmtNum(totals.jobs)} tone="good" cite="design.jobs" />
               <Stat
+                cite="design.co2"
                 label="Net CO₂e"
                 value={totals.co2Tpa.toLocaleString()}
                 unit="t/yr"
                 tone={totals.co2Tpa > 0 ? "danger" : "good"}
               />
-              <Stat label="Beneficiaries" value={fmtNum(totals.beneficiaries)} />
+              <Stat label="Beneficiaries" value={fmtNum(totals.beneficiaries)} cite="design.beneficiaries" />
               <Stat label="Integrity" value={integrity.overall} unit="/100" tone={integrity.overall > 60 ? "good" : "warn"} />
             </div>
             <ProvenanceTag
@@ -200,6 +204,11 @@ function DesignStudio() {
               source="Atlas component library — per-unit capex, load, water, land and employment intensities derived from published project benchmarks. Site-specific engineering will differ materially."
             />
           </Panel>
+
+          <CitationPanel
+            ids={["design.capex", "design.electricity", "design.water", "design.land", "design.jobs", "design.co2", "design.beneficiaries", "design.capitals"]}
+            title="Data provenance · design factors"
+          />
         </div>
 
         <aside className="space-y-3">
@@ -250,6 +259,24 @@ function DesignStudio() {
               </p>
             </div>
           </Panel>
+
+          <ActionButton
+            variant="accent"
+            className="w-full"
+            onClick={() =>
+              downloadReport(
+                infrastructureBlueprint(
+                  place,
+                  items,
+                  totals,
+                  (id) => DESIGN_COMPONENTS.find((c) => c.id === id)?.label ?? id,
+                  integrity,
+                ),
+              )
+            }
+          >
+            EXPORT INFRASTRUCTURE BLUEPRINT
+          </ActionButton>
 
           <div className="flex gap-2">
             <Link to="/capital" className="flex-1">
