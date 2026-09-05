@@ -351,20 +351,20 @@ function Simulate() {
         <div className="space-y-4">
           <Panel label={`System response · ${place.name}`}>
             <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-              <Stat label="Energy demand" value={out.energyDemandTwh} unit="TWh/yr" hint={`vs baseline ${delta(out.energyDemandTwh, baseline.energyDemandTwh)}`} tone="primary" />
-              <Stat label="Compute load" value={out.computeLoadMw} unit="MW" hint={`vs baseline ${delta(out.computeLoadMw, baseline.computeLoadMw)}`} />
-              <Stat label="Water demand" value={out.waterDemandMm3} unit="Mm³/yr" hint={`vs baseline ${delta(out.waterDemandMm3, baseline.waterDemandMm3)}`} />
-              <Stat label="Emissions" value={out.emissionsMtco2e} unit="MtCO₂e" tone={out.emissionsMtco2e > baseline.emissionsMtco2e ? "danger" : "good"} />
-              <Stat label="Infrastructure gap" value={`$${out.infrastructureGapUsdB}B`} tone="warn" />
-              <Stat label="Capital requirement" value={`$${out.capitalRequirementUsdB}B`} />
-              <Stat label="People with access" value={out.peopleWithAccessM} unit="M" tone="good" />
-              <Stat label="Economic activity" value={out.economicActivityIndex} unit="index" />
+              <Stat label="Energy demand" value={out.energyDemandTwh} cite="sim.energyDemandTwh" unit="TWh/yr" hint={`vs baseline ${delta(out.energyDemandTwh, baseline.energyDemandTwh)}`} tone="primary" />
+              <Stat label="Compute load" value={out.computeLoadMw} cite="sim.computeLoadMw" unit="MW" hint={`vs baseline ${delta(out.computeLoadMw, baseline.computeLoadMw)}`} />
+              <Stat label="Water demand" value={out.waterDemandMm3} cite="sim.waterDemandMm3" unit="Mm³/yr" hint={`vs baseline ${delta(out.waterDemandMm3, baseline.waterDemandMm3)}`} />
+              <Stat label="Emissions" value={out.emissionsMtco2e} cite="sim.emissionsMtco2e" unit="MtCO₂e" tone={out.emissionsMtco2e > baseline.emissionsMtco2e ? "danger" : "good"} />
+              <Stat label="Infrastructure gap" value={`$${out.infrastructureGapUsdB}B`} cite="sim.infrastructureGapUsdB" tone="warn" />
+              <Stat label="Capital requirement" value={`$${out.capitalRequirementUsdB}B`} cite="sim.capitalRequirementUsdB" />
+              <Stat label="People with access" value={out.peopleWithAccessM} cite="sim.peopleWithAccessM" unit="M" tone="good" />
+              <Stat label="Economic activity" value={out.economicActivityIndex} cite="sim.economicActivityIndex" unit="index" />
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <Meter label="Resilience" value={out.resilience} color="var(--good)" />
-              <Meter label="Ecosystem health" value={out.ecosystemHealth} color="var(--signal-ecology)" />
-              <Meter label="RICI" value={out.ricIndex} color="var(--primary)" />
+              <Meter label="Resilience" value={out.resilience} cite="sim.resilience" color="var(--good)" />
+              <Meter label="Ecosystem health" value={out.ecosystemHealth} cite="sim.ecosystemHealth" color="var(--signal-ecology)" />
+              <Meter label="RICI" value={out.ricIndex} cite="sim.ricIndex" color="var(--primary)" />
             </div>
 
             <ProvenanceTag
@@ -424,6 +424,8 @@ function Simulate() {
               </ul>
             </Panel>
           </div>
+
+          <CitationPanel ids={SCENARIO_METRICS.map((m) => m.citeId)} title="Data provenance · scenario outputs" />
         </div>
       </div>
     </Shell>
