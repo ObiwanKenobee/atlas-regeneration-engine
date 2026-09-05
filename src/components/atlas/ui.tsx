@@ -52,9 +52,10 @@ export function MetricCite({ id, align = "left" }: { id: string; align?: "left" 
           />
           <span
             className={cn(
-              "absolute top-5 z-50 block w-[288px] rounded-md border border-border bg-surface-2 p-3 text-left shadow-[0_18px_50px_-12px_rgba(0,0,0,0.8)]",
+              "absolute top-5 z-50 block w-[288px] rounded-md border border-border p-3 text-left shadow-[0_18px_50px_-12px_rgba(0,0,0,0.85)]",
               align === "right" ? "right-0" : "left-0",
             )}
+            style={{ background: "oklch(0.19 0.022 247)" }}
           >
             <span className="label-xs block text-foreground">{p.label}</span>
             <span className="mt-1 block">
