@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
 import { DependencyGraph } from "@/components/atlas/DependencyGraph";
-import { ActionButton, Chip, FactList, Meter, Panel, ProvenanceTag, Stat } from "@/components/atlas/ui";
+import { ActionButton, Chip, CitationPanel, FactList, Meter, Panel, ProvenanceTag, Stat } from "@/components/atlas/ui";
 import {
   ASSETS,
   FACT_BASIS_NOTE,
@@ -16,6 +16,7 @@ import {
   type SystemId,
 } from "@/lib/atlas/data";
 import { RICI_WEIGHTS, fmtNum, fmtUsdM, rici, riciBand } from "@/lib/atlas/model";
+import { downloadReport, infrastructureThesis } from "@/lib/atlas/report";
 
 export const Route = createFileRoute("/explore")({
   validateSearch: z.object({ place: z.string().optional() }),
@@ -186,7 +187,7 @@ function Explore() {
             <p className="mt-3 text-sm text-muted-foreground">{place.headline}</p>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <Stat label="RICI" value={score.toFixed(1)} tone="primary" hint="Composite index, 0–100" />
+              <Stat label="RICI" value={score.toFixed(1)} tone="primary" hint="Composite index, 0–100" cite="rici" />
               <Stat
                 label="Constraint"
                 value={place.systemStatus.water.risk > place.systemStatus.energy.risk ? "Water" : "Energy"}
@@ -212,6 +213,20 @@ function Explore() {
             />
           </Panel>
 
+          <Panel label="Export">
+            <p className="text-[12px] text-muted-foreground">
+              A traceable document for {place.name}: position, index composition, system status,
+              verified statistics, opportunities and full source citations.
+            </p>
+            <ActionButton
+              variant="accent"
+              className="mt-3 w-full"
+              onClick={() => downloadReport(infrastructureThesis(place, opportunities))}
+            >
+              EXPORT INFRASTRUCTURE THESIS
+            </ActionButton>
+          </Panel>
+
           <Panel label="Verified statistics">
             <FactList facts={PLACE_FACTS[place.id] ?? []} note={FACT_BASIS_NOTE} />
           </Panel>
@@ -233,9 +248,9 @@ function Explore() {
                         </span>
                       </div>
                       <div className="mt-1.5 grid grid-cols-3 gap-2">
-                        <Meter label="Capacity" value={st.capacity} color={s.colorVar} />
-                        <Meter label="Demand" value={st.demand} color="var(--accent)" />
-                        <Meter label="Risk" value={st.risk} color="var(--danger)" />
+                        <Meter label="Capacity" value={st.capacity} color={s.colorVar} cite="system.capacity" />
+                        <Meter label="Demand" value={st.demand} color="var(--accent)" cite="system.demand" />
+                        <Meter label="Risk" value={st.risk} color="var(--danger)" cite="system.risk" />
                       </div>
                     </div>
                   );
@@ -243,6 +258,11 @@ function Explore() {
               )}
             </div>
           </Panel>
+
+          <CitationPanel
+            ids={["rici", "place.population", "system.capacity", "system.demand", "system.risk"]}
+            title="Data provenance · map metrics"
+          />
 
           <Panel label="Becoming possible">
             <p className="text-sm text-muted-foreground">{place.becomingPossible}</p>
@@ -292,7 +312,7 @@ function Explore() {
                   {o.opportunity}
                 </p>
                 <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <Stat label="Capital" value={fmtUsdM(o.capitalUsdM)} tone="primary" />
+                  <Stat label="Capital" value={fmtUsdM(o.capitalUsdM)} tone="primary" cite="capital.capex" />
                   <Stat label="Beneficiaries" value={fmtNum(o.beneficiaries)} />
                   <Stat label="Resilience" value={`+${o.resilienceGainPct}%`} tone="good" />
                   <Stat label="Emissions" value={fmtNum(o.emissionsTco2e)} unit="tCO₂e" tone="good" />
