@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
-import { FactList, Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
+import { CitationPanel, FactList, Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
 import {
   FACT_BASIS_NOTE,
   GRAPH_EDGES,
@@ -118,14 +118,14 @@ function Observe() {
         </Panel>
 
         <Panel label="Atlas Infrastructure Score · RICI">
-          <Stat label="Global composite" value={rici(world.indicators).toFixed(1)} tone="primary" />
+          <Stat label="Global composite" value={rici(world.indicators).toFixed(1)} tone="primary" cite="rici" />
           <p className="mt-2 text-[13px] text-muted-foreground">
             Weighted mean of ten indicators. The methodology is never hidden — drill from global to
             country, region, city, system, asset, indicator.
           </p>
           <div className="mt-3 space-y-2">
             {RICI_WEIGHTS.map((w) => (
-              <Meter key={w.key} label={`${w.label} · weight ${w.weight}`} value={world.indicators[w.key]} />
+              <Meter key={w.key} label={`${w.label} · weight ${w.weight}`} value={world.indicators[w.key]} cite="rici" />
             ))}
           </div>
         </Panel>
@@ -152,6 +152,13 @@ function Observe() {
             })}
           </ul>
         </Panel>
+      </div>
+
+      <div className="mt-4">
+        <CitationPanel
+          ids={["rici", "system.capacity", "system.demand", "system.risk", "radar.frontier", "place.population"]}
+          title="Data provenance · dashboard metrics"
+        />
       </div>
 
       <Panel className="mt-4" label="Infrastructure opportunity graph">
