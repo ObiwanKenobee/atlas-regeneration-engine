@@ -87,6 +87,46 @@ function Simulate() {
     return `${d > 0 ? "+" : ""}${d.toFixed(1)}`;
   };
 
+  // ---- comparison mode ----------------------------------------------------
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>(["current", "bau", "regenerative"]);
+
+  const candidates = useMemo(() => {
+    const list: Array<{ id: string; label: string; placeId: string; vars: ScenarioVars }> = [
+      { id: "current", label: "Current settings", placeId, vars },
+      ...SCENARIO_PRESETS.map((p) => ({ id: p.id, label: p.label, placeId, vars: p.vars })),
+      ...saved.map((s, i) => ({ id: `saved-${i}`, label: s.name, placeId: s.placeId, vars: s.vars })),
+    ];
+    return list;
+  }, [placeId, vars, saved]);
+
+  const comparedScenarios: ComparedScenario[] = useMemo(
+    () =>
+      compareIds
+        .map((id) => candidates.find((c) => c.id === id))
+        .filter((c): c is NonNullable<typeof c> => Boolean(c))
+        .map((c) => ({
+          id: c.id,
+          label: c.label,
+          placeId: c.placeId,
+          vars: c.vars,
+          out: simulate(PLACE_BY_ID[c.placeId] ?? place, c.vars),
+        })),
+    [compareIds, candidates, place],
+  );
+
+  const comparison = useMemo(() => compareScenarios(comparedScenarios), [comparedScenarios]);
+
+  const toggleCompare = (id: string) =>
+    setCompareIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 4 ? prev : [...prev, id],
+    );
+
+  const exportScenario = () =>
+    downloadReport(
+      futureScenario(place, vars, out, baseline, SCENARIO_PRESETS.find((p) => p.id === preset)?.label),
+    );
+
   return (
     <Shell>
       <SectionTitle
@@ -94,6 +134,143 @@ function Simulate() {
         title="Simulate the future"
         sub="Change the variables. Every output below is a stated function of the inputs — no hidden magic, no decorative numbers."
       />
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <ActionButton variant={compareMode ? "primary" : "ghost"} onClick={() => setCompareMode((c) => !c)}>
+          {compareMode ? "EXIT COMPARISON MODE" : "COMPARE SCENARIOS"}
+        </ActionButton>
+        <ActionButton variant="accent" onClick={exportScenario}>
+          EXPORT FUTURE SCENARIO
+        </ActionButton>
+      </div>
+
+      {compareMode && (
+        <div className="mb-4 space-y-4">
+          <Panel label="Futures in comparison · pick up to four">
+            <div className="flex flex-wrap gap-1.5">
+              {candidates.map((c) => (
+                <Chip key={c.id} active={compareIds.includes(c.id)} onClick={() => toggleCompare(c.id)}>
+                  {c.label}
+                </Chip>
+              ))}
+            </div>
+          </Panel>
+
+          {comparedScenarios.length >= 2 ? (
+            <>
+              <Panel label="Side-by-side system response">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[620px] border-collapse text-[13px]">
+                    <thead>
+                      <tr>
+                        <th className="label-xs border-b border-border py-2 text-left">Metric</th>
+                        {comparedScenarios.map((s) => (
+                          <th key={s.id} className="label-xs border-b border-border py-2 text-right">
+                            {s.label}
+                          </th>
+                        ))}
+                        <th className="label-xs border-b border-border py-2 text-right">Spread</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparison.rows.map((r) => (
+                        <tr key={r.meta.key}>
+                          <td className="border-b border-border py-2 pr-3">
+                            <span className="flex items-center gap-1.5">
+                              <span className="text-muted-foreground">{r.meta.label}</span>
+                              <span className="label-xs text-[9px] text-muted-foreground">{r.meta.unit}</span>
+                            </span>
+                          </td>
+                          {r.values.map((v, i) => (
+                            <td
+                              key={i}
+                              className="num border-b border-border py-2 text-right"
+                              style={{
+                                color:
+                                  i === r.bestIndex
+                                    ? "var(--good)"
+                                    : i === r.worstIndex
+                                      ? "var(--warn)"
+                                      : "var(--foreground)",
+                              }}
+                            >
+                              {v}
+                            </td>
+                          ))}
+                          <td className="num border-b border-border py-2 text-right text-muted-foreground">
+                            {r.spreadPct}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  Green marks the favourable end of each row, amber the unfavourable one. Direction of
+                  benefit is declared per metric: {SCENARIO_METRICS.filter((m) => m.better === "lower").length}{" "}
+                  metrics are better lower, the rest better higher.
+                </p>
+                <ProvenanceTag
+                  method="Modeled"
+                  confidence="Low"
+                  source="Atlas scenario model v0.4 — the same deterministic equations applied to each variable set. Differences between columns are model differences, not observations."
+                  year={2025}
+                />
+              </Panel>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Panel label="Biggest trade-offs">
+                  <ul className="space-y-3">
+                    {comparison.tradeoffs.map((t) => (
+                      <li key={t.label} className="border-b border-border pb-2.5 last:border-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[13px] text-foreground">{t.label}</span>
+                          <span className="num text-xs text-primary">{t.spreadPct}% spread</span>
+                        </div>
+                        <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{t.reading}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </Panel>
+
+                <Panel label="Expected impact per future">
+                  <div className="space-y-3">
+                    {comparison.impacts.map((im) => (
+                      <div key={im.id} className="border-b border-border pb-2.5 last:border-0">
+                        <div className="label-xs text-foreground">{im.label}</div>
+                        <ul className="mt-1 space-y-0.5 text-[12px]">
+                          {im.gains.map((g) => (
+                            <li key={g} className="text-good">
+                              + {g}
+                            </li>
+                          ))}
+                          {im.costs.map((c) => (
+                            <li key={c} className="text-warn">
+                              − {c}
+                            </li>
+                          ))}
+                          {im.gains.length === 0 && im.costs.length === 0 && (
+                            <li className="text-muted-foreground">
+                              Materially indistinguishable from the other futures selected.
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </Panel>
+              </div>
+            </>
+          ) : (
+            <Panel label="Side-by-side system response">
+              <p className="text-sm text-muted-foreground">
+                Select at least two futures to compare.
+              </p>
+            </Panel>
+          )}
+        </div>
+      )}
+
 
       <div className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
         <div className="space-y-3">
