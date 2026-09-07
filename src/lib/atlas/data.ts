@@ -368,7 +368,7 @@ export const PLACES: Place[] = [
     id: "lagos",
     name: "Lagos",
     scope: "City",
-    parent: "africa",
+    parent: "nigeria",
     lat: 6.52,
     lon: 3.37,
     population: 16_500_000,
@@ -461,7 +461,7 @@ export const PLACES: Place[] = [
     id: "sao-paulo",
     name: "São Paulo",
     scope: "City",
-    parent: "world",
+    parent: "brazil",
     lat: -23.55,
     lon: -46.63,
     population: 22_600_000,
@@ -517,6 +517,99 @@ export const PLACES: Place[] = [
       method: "Observed",
       confidence: "High",
       resolution: "Grid region",
+    },
+  },
+  {
+    id: "nigeria",
+    name: "Nigeria",
+    scope: "National",
+    parent: "africa",
+    lat: 9.08,
+    lon: 8.68,
+    population: 227_000_000,
+    gdpPerCapita: 1600,
+    headline: "13 GW installed, roughly 4.5 GW actually delivered.",
+    constraint: "Transmission collapse risk, gas supply and utility liquidity.",
+    becomingPossible: "Distributed solar and mini-grids replacing a national generator fleet.",
+    indicators: ind([31, 63, 34, 26, 33, 47, 44, 55, 41, 46]),
+    systemStatus: status([
+      ["energy", 30, 88, 4.1, 82],
+      ["compute", 41, 79, 27.0, 54],
+      ["water", 38, 76, 3.0, 68],
+      ["land", 55, 72, 2.2, 61],
+      ["mobility", 42, 81, 3.1, 57],
+      ["human", 44, 89, 2.4, 52],
+      ["ecology", 43, 72, -1.9, 69],
+      ["capital", 39, 84, 5.8, 66],
+    ]),
+    provenance: {
+      source: "Atlas composite (NERC, TCN, NBS, World Bank)",
+      year: 2025,
+      method: "Estimated",
+      confidence: "Medium",
+      resolution: "National",
+    },
+  },
+  {
+    id: "south-africa",
+    name: "South Africa",
+    scope: "National",
+    parent: "africa",
+    lat: -28.5,
+    lon: 24.7,
+    population: 63_000_000,
+    gdpPerCapita: 6300,
+    headline: "The continent's largest grid, mid-transition out of coal.",
+    constraint: "Ageing coal fleet, transmission build-out in the Cape corridors.",
+    becomingPossible: "Private wheeling and storage turning curtailment into firm supply.",
+    indicators: ind([58, 90, 46, 44, 47, 42, 56, 64, 61, 52]),
+    systemStatus: status([
+      ["energy", 54, 82, 2.2, 71],
+      ["compute", 63, 81, 22.0, 42],
+      ["water", 44, 79, 1.8, 73],
+      ["land", 57, 66, 1.1, 55],
+      ["mobility", 55, 68, 1.4, 49],
+      ["human", 54, 84, 1.2, 58],
+      ["ecology", 46, 70, -1.1, 64],
+      ["capital", 62, 74, 4.2, 44],
+    ]),
+    provenance: {
+      source: "Atlas composite (Eskom, NERSA, CSIR, DMRE, Stats SA)",
+      year: 2025,
+      method: "Estimated",
+      confidence: "Medium",
+      resolution: "National",
+    },
+  },
+  {
+    id: "brazil",
+    name: "Brazil",
+    scope: "National",
+    parent: "world",
+    lat: -12.5,
+    lon: -50.0,
+    population: 213_000_000,
+    gdpPerCapita: 10300,
+    headline: "A near-decarbonised grid now constrained by wires, not watts.",
+    constraint: "Transmission bottlenecks and curtailment in the North-East.",
+    becomingPossible: "Clean-firm industry and compute sited where the curtailment is.",
+    indicators: ind([69, 97, 54, 68, 55, 52, 65, 63, 66, 60]),
+    systemStatus: status([
+      ["energy", 74, 76, 3.6, 46],
+      ["compute", 55, 80, 24.0, 41],
+      ["water", 62, 72, 1.9, 58],
+      ["land", 61, 74, 1.6, 66],
+      ["mobility", 54, 71, 1.7, 47],
+      ["human", 60, 78, 1.0, 44],
+      ["ecology", 49, 79, -1.6, 72],
+      ["capital", 63, 72, 4.9, 43],
+    ]),
+    provenance: {
+      source: "Atlas composite (ONS, ANEEL, EPE, ANA, IBGE)",
+      year: 2025,
+      method: "Estimated",
+      confidence: "Medium",
+      resolution: "National",
     },
   },
 ];
@@ -795,7 +888,74 @@ export const OPPORTUNITIES: Opportunity[] = [
     capitals: { financial: 88, human: 51, social: 47, natural: 59, knowledge: 72, technological: 90, cultural: 30 },
     confidence: "Medium",
   },
+  {
+    id: "opp-007",
+    code: "OPPORTUNITY #007",
+    title: "Ethiopia–Kenya–Tanzania Trade Corridor Utilisation",
+    placeId: "east-africa",
+    systems: ["energy", "capital"],
+    problem:
+      "The 2,000 MW Ethiopia–Kenya HVDC link and the new 400 kV Kenya–Tanzania line run far below rated capacity because trading rules, settlement and dispatch coordination lag the steel.",
+    opportunity:
+      "Fund the market layer — day-ahead trading, settlement guarantees and coordinated dispatch — so existing hardware carries 3–4× more energy without a metre of new line.",
+    capitalUsdM: 180,
+    beneficiaries: 24_000_000,
+    resilienceGainPct: 28,
+    emissionsTco2e: 1_900_000,
+    regenerativePotential: "Very High",
+    whyNow: "Both interconnectors are physically complete; the binding constraint is now institutional, and institutional capital is cheap relative to transmission capital.",
+    whatCouldChange: "Ethiopian hydro firms Kenyan and Tanzanian evening peaks; regional reserve margins rise without new thermal plant.",
+    whoParticipates: ["EAPP", "KETRACO", "Ethiopian Electric Power", "TANESCO", "Kenya Power", "World Bank", "African Development Bank"],
+    whatCouldPrevent: ["Sovereign payment risk between utilities", "Currency convertibility", "Political appetite for import dependence", "Metering and settlement data quality"],
+    capitals: { financial: 78, human: 52, social: 48, natural: 72, knowledge: 66, technological: 74, cultural: 34 },
+    confidence: "Medium",
+  },
+  {
+    id: "opp-008",
+    code: "OPPORTUNITY #008",
+    title: "Rift Valley Geothermal Compute Corridor",
+    placeId: "east-africa",
+    systems: ["energy", "compute", "capital"],
+    problem:
+      "Rift Valley geothermal is 24/7 clean firm power at one of the lowest costs on Earth, yet the region exports talent and imports compute.",
+    opportunity:
+      "Co-locate 120 MW IT of compute capacity with geothermal wellheads in Kenya and Ethiopia, anchored by regional cloud and AI demand rather than speculative hyperscale.",
+    capitalUsdM: 1_150,
+    beneficiaries: 420_000,
+    resilienceGainPct: 19,
+    emissionsTco2e: 640_000,
+    regenerativePotential: "High",
+    whyNow: "Geothermal wellhead units can be energised in 18 months, faster than grid interconnection anywhere else in the corridor.",
+    whatCouldChange: "Regional data sovereignty becomes affordable; wellhead steam that is currently vented earns revenue.",
+    whoParticipates: ["KenGen", "Geothermal Development Company", "Ethiopian Electric Power", "Regional cloud operators", "DFIs", "Universities"],
+    whatCouldPrevent: ["Subsea cable latency and capacity", "Skills pipeline for operations", "Water for cooling in arid zones", "Power purchase agreement structure"],
+    capitals: { financial: 82, human: 58, social: 42, natural: 60, knowledge: 84, technological: 92, cultural: 30 },
+    confidence: "Medium",
+  },
+  {
+    id: "opp-009",
+    code: "OPPORTUNITY #009",
+    title: "Lake Victoria Basin Water–Food–Energy Compact",
+    placeId: "east-africa",
+    systems: ["water", "land", "ecology", "human"],
+    problem:
+      "Three countries share one basin with fragmented monitoring, collapsing fisheries, and irrigation that competes with hydropower releases at Nalubaale and Kiira.",
+    opportunity:
+      "One shared measurement backbone plus co-financed wetland restoration and solar irrigation, governed by a basin compact rather than three national plans.",
+    capitalUsdM: 320,
+    beneficiaries: 40_000_000,
+    resilienceGainPct: 31,
+    emissionsTco2e: 210_000,
+    regenerativePotential: "Very High",
+    whyNow: "Restoration finance is available and basin data is now cheap to collect; the political cost of inaction is rising with each fishery collapse.",
+    whatCouldChange: "Fish stocks stabilise, irrigation and hydropower stop bidding against each other, and the basin becomes investable as one asset.",
+    whoParticipates: ["Lake Victoria Basin Commission", "Riparian county and district governments", "Fisher cooperatives", "Green Climate Fund", "Research institutions"],
+    whatCouldPrevent: ["Cross-border data sharing", "Enforcement capacity", "Upstream land-use change", "Competing hydropower release schedules"],
+    capitals: { financial: 48, human: 88, social: 86, natural: 94, knowledge: 70, technological: 44, cultural: 82 },
+    confidence: "Low",
+  },
 ];
+
 
 export type DesignComponent = {
   id: string;
@@ -986,7 +1146,8 @@ export const PLACE_FACTS: Record<string, PlaceFact[]> = {
     { label: "Geothermal capacity", value: "~985 MW", note: "Olkaria complex dominant", basis: "Reported", source: "EPRA / KenGen", year: 2024 },
     { label: "Renewable share of generation", value: "~90%", basis: "Reported", source: "EPRA", year: 2024 },
     { label: "System losses (T&D)", value: "~22–23%", basis: "Reported", source: "Kenya Power annual report", year: 2024 },
-    { label: "Electricity access", value: "~75%", note: "grid + off-grid solar", basis: "Estimated", source: "Atlas from World Bank / MoE data", year: 2023 },
+    { label: "Electricity access", value: "77.0%", note: "grid + off-grid solar", basis: "Reported", source: "World Bank (EG.ELC.ACCS.ZS)", year: 2024 },
+    { label: "Peak demand", value: "2,316 MW", note: "record set Feb 2024", basis: "Reported", source: "Kenya Power / EPRA", year: 2024 },
   ],
   nairobi: [
     { label: "Water demand vs supply", value: "810,000 vs ~525,000 m³/d", note: "≈35% structural deficit", basis: "Estimated", source: "Atlas from NCWSC / Athi Water figures", year: 2023 },
@@ -1005,6 +1166,32 @@ export const PLACE_FACTS: Record<string, PlaceFact[]> = {
     { label: "GERD installed capacity", value: "5,150 MW", basis: "Reported", source: "Ethiopian Electric Power", year: 2024 },
     { label: "Regional electricity access", value: "~45%", basis: "Estimated", source: "Atlas from IEA / World Bank country data", year: 2023 },
     { label: "Cross-border traded power", value: "<3% of regional demand", basis: "Estimated", source: "Atlas from EAPP reporting", year: 2023 },
+    { label: "Kenya–Tanzania interconnector", value: "400 kV / ~1,400 MW", note: "energised 2025, closing the Ethiopia–Zambia corridor", basis: "Reported", source: "KETRACO / TANESCO", year: 2025 },
+    { label: "Julius Nyerere hydropower", value: "2,115 MW", basis: "Reported", source: "TANESCO", year: 2024 },
+    { label: "Karuma hydropower", value: "600 MW", note: "commissioned 2024", basis: "Reported", source: "Uganda Electricity Generation Co.", year: 2024 },
+    { label: "Regional installed capacity", value: "~13–15 GW", note: "EAPP member states combined", basis: "Estimated", source: "Atlas from national utility reports", year: 2024 },
+    { label: "Geothermal potential, Rift Valley", value: "~15–20 GW", basis: "Modeled", source: "GDC / IRENA resource assessment", year: 2023 },
+  ],
+  nigeria: [
+    { label: "Installed grid capacity", value: "13.0 GW installed / ~4.5 GW delivered", basis: "Reported", source: "NERC quarterly reports", year: 2024 },
+    { label: "National grid collapses", value: "12 in 2024", basis: "Reported", source: "Transmission Company of Nigeria (TCN)", year: 2024 },
+    { label: "Electricity access", value: "62.5%", basis: "Reported", source: "World Bank / IEA SDG7 (EG.ELC.ACCS.ZS)", year: 2024 },
+    { label: "Self-generation (gensets)", value: "~14 GW", note: "larger than the grid it backs up", basis: "Estimated", source: "Atlas from NESP and industry studies", year: 2023 },
+    { label: "Mini-grid connections", value: "~150,000 households", basis: "Estimated", source: "Atlas from REA / NEP disclosures", year: 2024 },
+  ],
+  "south-africa": [
+    { label: "Eskom installed capacity", value: "~48 GW", note: "coal ≈39 GW of it", basis: "Reported", source: "Eskom integrated report", year: 2024 },
+    { label: "Load-shedding days", value: "332 days in 2023 → near zero in 2024", basis: "Reported", source: "CSIR Statistics of Power in South Africa", year: 2024 },
+    { label: "Renewables procured (REIPPPP)", value: "~6.4 GW contracted", basis: "Reported", source: "DMRE / IPP Office", year: 2024 },
+    { label: "Electricity access", value: "90.2%", basis: "Reported", source: "World Bank (EG.ELC.ACCS.ZS)", year: 2024 },
+    { label: "Colocation data-centre capacity", value: "~150–200 MW IT", note: "largest African market", basis: "Estimated", source: "Atlas from operator disclosures", year: 2025 },
+  ],
+  brazil: [
+    { label: "Installed generation capacity", value: "~200 GW", basis: "Reported", source: "ANEEL / ONS", year: 2024 },
+    { label: "Renewable electricity share", value: "~88%", basis: "Reported", source: "EPE Balanço Energético Nacional", year: 2024 },
+    { label: "Wind + solar capacity", value: "~30 GW wind / ~50 GW solar", note: "solar includes distributed generation", basis: "Reported", source: "ABSOLAR / ABEEólica", year: 2024 },
+    { label: "North-East curtailment", value: "~4–8% of wind and solar output", basis: "Estimated", source: "Atlas from ONS constraint-off records", year: 2024 },
+    { label: "Electricity access", value: "99.8%", basis: "Reported", source: "World Bank (EG.ELC.ACCS.ZS)", year: 2024 },
   ],
   lagos: [
     { label: "Nigeria grid capacity", value: "13 GW installed / ~4.5 GW available", basis: "Reported", source: "NERC quarterly reports", year: 2024 },
@@ -1041,3 +1228,59 @@ export const PLACE_FACTS: Record<string, PlaceFact[]> = {
 
 export const FACT_BASIS_NOTE =
   "Reported = published by the named source. Estimated = Atlas estimate from partial public data. Modeled = model output, not a measurement.";
+
+// ---------------------------------------------------------------------------
+// East Africa regional layer — corridors and a region-specific dependency graph.
+// ---------------------------------------------------------------------------
+
+export type Corridor = {
+  id: string;
+  label: string;
+  from: string;
+  to: string;
+  system: SystemId;
+  capacity: string;
+  status: "Operating" | "Commissioning" | "Under construction" | "Planned";
+  utilisation: number;
+  basis: FactBasis;
+  source: string;
+  year: number;
+  note: string;
+};
+
+export const EAST_AFRICA_CORRIDORS: Corridor[] = [
+  { id: "eth-ken", label: "Ethiopia–Kenya HVDC", from: "Wolayta-Sodo", to: "Suswa", system: "energy", capacity: "2,000 MW / 500 kV", status: "Operating", utilisation: 22, basis: "Reported", source: "World Bank / KETRACO", year: 2024, note: "Physically complete since 2022; traded volume constrained by contract terms, not steel." },
+  { id: "ken-tza", label: "Kenya–Tanzania 400 kV", from: "Isinya", to: "Singida", system: "energy", capacity: "~1,400 MW / 400 kV", status: "Commissioning", utilisation: 8, basis: "Reported", source: "KETRACO / TANESCO", year: 2025, note: "Closes the Ethiopia-to-Zambia corridor; trading arrangements still being settled." },
+  { id: "ken-uga", label: "Kenya–Uganda 400 kV", from: "Lessos", to: "Bujagali", system: "energy", capacity: "~300 MW", status: "Operating", utilisation: 41, basis: "Reported", source: "KETRACO / UETCL", year: 2024, note: "The corridor's most consistently used link." },
+  { id: "sgr", label: "Standard Gauge Railway", from: "Mombasa", to: "Naivasha", system: "mobility", capacity: "~12 Mt/yr design", status: "Operating", utilisation: 55, basis: "Estimated", source: "Atlas from Kenya Railways freight data", year: 2024, note: "Freight volumes below design; last-mile to Kampala still road-bound." },
+  { id: "eassy", label: "Subsea cable landings", from: "Mombasa", to: "Djibouti", system: "compute", capacity: "multi-Tbps (EASSy, SEACOM, 2Africa, PEACE)", status: "Operating", utilisation: 34, basis: "Estimated", source: "Atlas from operator disclosures", year: 2025, note: "Coastal capacity is ample; inland terrestrial backhaul is the bottleneck." },
+  { id: "lvb", label: "Lake Victoria Basin", from: "Kisumu", to: "Mwanza", system: "water", capacity: "68,800 km² shared basin", status: "Operating", utilisation: 0, basis: "Reported", source: "Lake Victoria Basin Commission", year: 2023, note: "Shared by Kenya, Uganda, Tanzania, Rwanda and Burundi with fragmented monitoring." },
+];
+
+export const EA_GRAPH_NODES: GraphNode[] = [
+  { id: "ea-hydro", label: "Ethiopian hydro surplus", kind: "Asset", x: 14, y: 20 },
+  { id: "ea-hvdc", label: "Ethiopia–Kenya HVDC", kind: "Asset", x: 34, y: 34 },
+  { id: "ea-market", label: "Missing market layer", kind: "Problem", x: 34, y: 72 },
+  { id: "ea-geo", label: "Rift Valley geothermal", kind: "Technology", x: 14, y: 58 },
+  { id: "ea-eapp", label: "East Africa Power Pool", kind: "Organization", x: 54, y: 54 },
+  { id: "ea-compute", label: "Regional compute demand", kind: "Ecosystem", x: 74, y: 26 },
+  { id: "ea-dfi", label: "DFI + climate capital", kind: "Capital", x: 54, y: 88 },
+  { id: "ea-basin", label: "Lake Victoria basin", kind: "Place", x: 74, y: 70 },
+  { id: "ea-fisher", label: "Fisher and farmer cooperatives", kind: "Community", x: 90, y: 86 },
+  { id: "ea-project", label: "Corridor utilisation programme", kind: "Project", x: 74, y: 50 },
+  { id: "ea-outcome", label: "Firm clean power, traded", kind: "Outcome", x: 92, y: 40 },
+];
+
+export const EA_GRAPH_EDGES: Array<{ from: string; to: string; rel: string }> = [
+  { from: "ea-hydro", to: "ea-hvdc", rel: "SUPPLIES" },
+  { from: "ea-hvdc", to: "ea-eapp", rel: "DEPENDS_ON" },
+  { from: "ea-market", to: "ea-hvdc", rel: "CONSTRAINS" },
+  { from: "ea-geo", to: "ea-eapp", rel: "SUPPLIES" },
+  { from: "ea-eapp", to: "ea-project", rel: "ENABLES" },
+  { from: "ea-dfi", to: "ea-project", rel: "FUNDS" },
+  { from: "ea-project", to: "ea-outcome", rel: "GENERATES" },
+  { from: "ea-compute", to: "ea-outcome", rel: "BENEFITS" },
+  { from: "ea-basin", to: "ea-fisher", rel: "SERVES" },
+  { from: "ea-project", to: "ea-basin", rel: "IMPACTS" },
+  { from: "ea-geo", to: "ea-compute", rel: "ENABLES" },
+];
