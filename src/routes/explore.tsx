@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
 import { DependencyGraph } from "@/components/atlas/DependencyGraph";
+import { LivePlantsPanel } from "@/components/atlas/LiveFeeds";
 import { ActionButton, Chip, CitationPanel, FactList, Meter, Panel, ProvenanceTag, Stat } from "@/components/atlas/ui";
 import {
   ASSETS,
@@ -17,6 +18,13 @@ import {
 } from "@/lib/atlas/data";
 import { RICI_WEIGHTS, fmtNum, fmtUsdM, rici, riciBand } from "@/lib/atlas/model";
 import { downloadReport, infrastructureThesis } from "@/lib/atlas/report";
+
+const ISO2_OF: Record<string, { iso2: string; name: string }> = {
+  kenya: { iso2: "KE", name: "Kenya" }, nairobi: { iso2: "KE", name: "Kenya" }, "west-kenya": { iso2: "KE", name: "Kenya" },
+  "east-africa": { iso2: "KE", name: "Kenya" }, nigeria: { iso2: "NG", name: "Nigeria" }, lagos: { iso2: "NG", name: "Nigeria" },
+  "south-africa": { iso2: "ZA", name: "South Africa" }, brazil: { iso2: "BR", name: "Brazil" }, "sao-paulo": { iso2: "BR", name: "Brazil" },
+  india: { iso2: "IN", name: "India" },
+};
 
 export const Route = createFileRoute("/explore")({
   validateSearch: z.object({ place: z.string().optional() }),
@@ -230,6 +238,9 @@ function Explore() {
           <Panel label="Verified statistics">
             <FactList facts={PLACE_FACTS[place.id] ?? []} note={FACT_BASIS_NOTE} />
           </Panel>
+          {ISO2_OF[place.id] && (
+            <LivePlantsPanel iso2={ISO2_OF[place.id]!.iso2} countryName={ISO2_OF[place.id]!.name} />
+          )}
 
           <Panel label="System status">
             <div className="space-y-3">
