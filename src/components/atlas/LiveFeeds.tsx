@@ -6,7 +6,7 @@ import { Panel } from "./ui";
 const fmt = (id: string, v: number) =>
   id === "NY.GDP.PCAP.CD" ? `$${Math.round(v).toLocaleString()}` : `${v.toFixed(1)}%`;
 
-function FeedStatus({ ok, fetchedAt, source, licence, error, loading }: { ok?: boolean; fetchedAt?: string; source: string; licence: string; error?: string; loading: boolean }) {
+function FeedStatus({ ok, fetchedAt, source, licence, error, loading }: { ok?: boolean | undefined; fetchedAt?: string | undefined; source: string; licence: string; error?: string | undefined; loading: boolean }) {
   return (
     <div className="label-xs mt-3 flex flex-wrap items-center gap-2 text-[9px]">
       <i

@@ -94,10 +94,10 @@ export const getWorldBankIndicators = createServerFn({ method: "GET" }).handler(
 export type LivePlant = {
   id: string;
   name: string;
-  operator?: string;
-  method?: string;
-  source?: string;
-  outputMw?: number;
+  operator?: string | undefined;
+  method?: string | undefined;
+  source?: string | undefined;
+  outputMw?: number | undefined;
   lat: number;
   lon: number;
 };

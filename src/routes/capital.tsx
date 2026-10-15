@@ -26,8 +26,8 @@ export const Route = createFileRoute("/capital")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { opp?: string } => ({
-    opp: typeof search.opp === "string" ? search.opp : undefined,
+  validateSearch: (search: Record<string, unknown>): { opp?: string | undefined } => ({
+    opp: typeof search["opp"] === "string" ? (search["opp"] as string) : undefined,
   }),
   component: Capital,
 });
