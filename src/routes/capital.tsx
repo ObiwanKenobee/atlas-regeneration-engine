@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { ActionButton, Chip, CitationPanel, Meter, Panel, ProvenanceTag, SectionTitle, Slider, Stat } from "@/components/atlas/ui";
 import { CAPITAL_SOURCES, OPPORTUNITIES, PLACE_BY_ID } from "@/lib/atlas/data";
 import { DEFAULT_STACK, fmtUsdM, stackAnalysis, type CapitalStack } from "@/lib/atlas/model";
 import { capitalStrategy, downloadReport } from "@/lib/atlas/report";
+import { BasisChip } from "@/components/atlas/ui";
+import { INVESTMENT_PARTNERS, partnerFit } from "@/lib/atlas/partners";
 
 export const Route = createFileRoute("/capital")({
   head: () => ({
@@ -24,15 +26,42 @@ export const Route = createFileRoute("/capital")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { opp?: string } => ({
+    opp: typeof search.opp === "string" ? search.opp : undefined,
+  }),
   component: Capital,
 });
 
+const COUNTRY_OF: Record<string, string> = {
+  nairobi: "Kenya", kenya: "Kenya", "west-kenya": "Kenya", "east-africa": "Kenya",
+  lagos: "Nigeria", nigeria: "Nigeria", "south-africa": "South Africa", "sao-paulo": "Brazil", brazil: "Brazil",
+};
+
 function Capital() {
-  const [oppId, setOppId] = useState(OPPORTUNITIES[0]!.id);
+  const search = Route.useSearch();
+  const [oppId, setOppId] = useState(
+    OPPORTUNITIES.some((o) => o.id === search.opp) ? search.opp! : OPPORTUNITIES[0]!.id,
+  );
   const [stack, setStack] = useState<CapitalStack>(DEFAULT_STACK);
+  const [partnerId, setPartnerId] = useState(INVESTMENT_PARTNERS[0]!.id);
 
   const opp = OPPORTUNITIES.find((o) => o.id === oppId)!;
   const analysis = stackAnalysis(stack, opp.capitalUsdM);
+  const partner = INVESTMENT_PARTNERS.find((p) => p.id === partnerId)!;
+  const fits = useMemo(
+    () =>
+      INVESTMENT_PARTNERS.map((p) => ({
+        p,
+        fit: partnerFit(p, {
+          capexUsdM: opp.capitalUsdM,
+          placeName: PLACE_BY_ID[opp.placeId]?.name ?? "",
+          country: COUNTRY_OF[opp.placeId] ?? "",
+          systems: opp.systems,
+        }),
+      })).sort((a, b) => b.fit.score - a.fit.score),
+    [opp],
+  );
+  const fit = fits.find((f) => f.p.id === partnerId)!.fit;
 
   return (
     <Shell>
@@ -119,6 +148,72 @@ function Capital() {
               confidence="Medium"
               source="Atlas capital model — weighted cost, patience and risk appetite per source class. Indicative only; not investment advice."
             />
+          </Panel>
+
+          <Panel label="Investment partner · real fund profile" right={<span className="label-xs">ranked by fit</span>}>
+            <div className="flex flex-wrap gap-1.5">
+              {fits.map(({ p, fit: f }) => (
+                <Chip key={p.id} active={p.id === partnerId} onClick={() => setPartnerId(p.id)}>
+                  {p.name.split(" — ")[0]} · {f.score}
+                </Chip>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-display text-lg tracking-tight">{partner.name}</h3>
+                <p className="label-xs mt-0.5">{partner.kind} · {partner.hq} · since {partner.founded}</p>
+              </div>
+              <a href={partner.website} target="_blank" rel="noreferrer" className="label-xs text-primary underline decoration-dotted">
+                official site
+              </a>
+            </div>
+            <p className="mt-3 text-[13px] text-muted-foreground">{partner.thesis}</p>
+            <div className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-4">
+              <Stat label="Fit with this project" value={fit.score} unit="/100" tone={fit.score >= 70 ? "good" : "warn"} />
+              <Stat label="Ticket range" value={`$${partner.ticketMinUsdM}–${partner.ticketMaxUsdM}M`} />
+              <Stat label="Indicative ticket" value={fmtUsdM(fit.partnerShareUsdM)} tone="primary" />
+              <Stat label="Target cost" value={`~${partner.targetCostOfCapital}%`} />
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div>
+                <div className="label-xs text-good">Why it fits</div>
+                <ul className="mt-1.5 space-y-1 text-[12px] text-muted-foreground">
+                  {fit.reasons.map((r) => <li key={r}>+ {r}</li>)}
+                </ul>
+                <div className="label-xs mt-3 text-warn">Frictions</div>
+                <ul className="mt-1.5 space-y-1 text-[12px] text-muted-foreground">
+                  {fit.frictions.length ? fit.frictions.map((r) => <li key={r}>− {r}</li>) : <li>None identified.</li>}
+                </ul>
+              </div>
+              <div>
+                <div className="label-xs">Instruments</div>
+                <p className="mt-1 text-[12px] text-muted-foreground">{partner.instruments.join(" · ")}</p>
+                <div className="label-xs mt-3">What they require</div>
+                <ul className="mt-1 space-y-1 text-[12px] text-muted-foreground">
+                  {partner.requirements.map((r) => <li key={r}>· {r}</li>)}
+                </ul>
+                <div className="label-xs mt-3">Red lines</div>
+                <p className="mt-1 text-[12px] text-muted-foreground">{partner.redLines.join(" · ")}</p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2 border-t border-border pt-3">
+              {partner.facts.map((f) => (
+                <div key={f.label} className="flex items-start justify-between gap-3 text-[12px]">
+                  <div>
+                    <span className="label-xs">{f.label}</span>
+                    <div>{f.value}</div>
+                    <div className="label-xs text-[9px]">{f.source} · {f.year}</div>
+                  </div>
+                  <BasisChip basis={f.basis} />
+                </div>
+              ))}
+            </div>
+            <ActionButton className="mt-4 w-full" onClick={() => setStack({ ...fit.suggestedStack })}>
+              APPLY {partner.name.split(" — ")[0].toUpperCase()}-LED STACK
+            </ActionButton>
+            <p className="label-xs mt-2 text-[9px]">
+              Fit score is Modeled from declared terms (geography, ticket range, sector, risk stage). Fund details are from the partner's own disclosures. Not investment advice.
+            </p>
           </Panel>
 
           <Panel label="Financing architecture">

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
 import { WorldCanvas } from "@/components/atlas/WorldCanvas";
+import { LiveIndicatorsPanel } from "@/components/atlas/LiveFeeds";
 import { CitationPanel, FactList, Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
 import {
   FACT_BASIS_NOTE,
@@ -78,6 +79,22 @@ function Observe() {
           />
         </Panel>
       </div>
+
+      <div className="mt-4">
+        <LiveIndicatorsPanel />
+      </div>
+
+      <Panel className="mt-4" label="Country statistics · Kenya, Nigeria, South Africa, Brazil">
+        <div className="grid gap-x-8 md:grid-cols-2 xl:grid-cols-4">
+          {(["kenya", "nigeria", "south-africa", "brazil"] as const).map((id) => (
+            <div key={id}>
+              <div className="label-xs mb-2 text-primary">{PLACES.find((p) => p.id === id)?.name}</div>
+              <FactList facts={PLACE_FACTS[id] ?? []} />
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">{FACT_BASIS_NOTE}</p>
+      </Panel>
 
       <Panel className="mt-4" label="Planetary statistics · what is actually measured">
         <div className="grid gap-x-8 gap-y-0 md:grid-cols-2 xl:grid-cols-3">

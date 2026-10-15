@@ -5,6 +5,7 @@ import { AtlasCopilot } from "./AtlasCopilot";
 const NAV = [
   { to: "/observe", label: "OBSERVE" },
   { to: "/explore", label: "EXPLORE" },
+  { to: "/east-africa", label: "EAST AFRICA" },
   { to: "/simulate", label: "SIMULATE" },
   { to: "/design", label: "DESIGN" },
   { to: "/capital", label: "CAPITAL" },
