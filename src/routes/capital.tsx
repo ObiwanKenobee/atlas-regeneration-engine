@@ -209,7 +209,7 @@ function Capital() {
               ))}
             </div>
             <ActionButton className="mt-4 w-full" onClick={() => setStack({ ...fit.suggestedStack })}>
-              APPLY {partner.name.split(" — ")[0].toUpperCase()}-LED STACK
+              APPLY {(partner.name.split(" — ")[0] ?? partner.name).toUpperCase()}-LED STACK
             </ActionButton>
             <p className="label-xs mt-2 text-[9px]">
               Fit score is Modeled from declared terms (geography, ticket range, sector, risk stage). Fund details are from the partner's own disclosures. Not investment advice.
