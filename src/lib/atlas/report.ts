@@ -337,3 +337,48 @@ export function downloadReport(report: Report, format: "md" | "txt" = "md") {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Full project proposal for the flagship worked example: design, finance, stakeholders, budget. */
+export function projectProposal(
+  flagship: import("./flagship").Flagship,
+  stack: CapitalStack,
+  analysis: { blendedCost: number; feasibility: number; annualDebtServiceUsdM: number; total: number },
+  partner?: { name: string; shareUsdM: number; score: number },
+): Report {
+  const f = flagship;
+  const lines: string[] = [header(`Project Proposal — ${f.name}`, f.location)];
+  lines.push("## Summary", "", f.summary, "", `**Why here:** ${f.whyHere}`, "");
+  lines.push("## Technical design", "", "| Component | Specification |", "| --- | --- |");
+  f.designItems.forEach((d) => lines.push(`| ${d.componentId} | ${d.label} |`));
+  lines.push(
+    "",
+    `- Annual generation: ${f.annualGenerationGwh} GWh (capacity factor ${(f.capacityFactor * 100).toFixed(1)}%) — Modeled`,
+    `- Offtake tariff: $${f.tariffUsdPerKwh}/kWh vs diesel-blended ~$${f.dieselDisplacedUsdPerKwh}/kWh — Estimated`,
+    `- CO₂e avoided: ${f.co2AvoidedTpa.toLocaleString()} t/yr — Modeled`,
+    `- Jobs: ${f.jobsConstruction} construction, ${f.jobsPermanent} permanent · Land: ${f.landHa} ha · Offtakers: ${f.offtakers}`,
+    "",
+  );
+  lines.push("## Budget", "", `Total capex: **${fmtUsdM(f.capexUsdM)}**`, "", "| Line item | USD | Share | Basis | Note |", "| --- | --- | --- | --- | --- |");
+  f.budget.forEach((b) => lines.push(`| ${b.item} | ${fmtUsdM(b.amountUsdM)} | ${b.share}% | ${b.basis} | ${b.note} |`));
+  lines.push("", "## Capital stack", "", "| Source | Share | USD |", "| --- | --- | --- |");
+  CAPITAL_SOURCES.filter((s) => (stack[s.id] ?? 0) > 0).forEach((s) =>
+    lines.push(`| ${s.label} | ${stack[s.id]}% | ${fmtUsdM(((stack[s.id] ?? 0) / Math.max(1, analysis.total)) * f.capexUsdM)} |`),
+  );
+  lines.push(
+    "",
+    `- Blended cost of capital: ${analysis.blendedCost}% — Modeled`,
+    `- Annual capital service: ${fmtUsdM(analysis.annualDebtServiceUsdM)} — Modeled`,
+    `- Feasibility: ${analysis.feasibility}/100 — Modeled`,
+  );
+  if (partner) lines.push(`- Lead investment partner: **${partner.name}**, indicative ticket ${fmtUsdM(partner.shareUsdM)}, fit ${partner.score}/100`);
+  lines.push("", "## Stakeholders", "", "| Stakeholder | Role | Interest | Commitment sought | Status |", "| --- | --- | --- | --- | --- |");
+  f.stakeholders.forEach((s) => lines.push(`| ${s.name} | ${s.role} | ${s.interest} | ${s.commitment} | ${s.status} |`));
+  lines.push("", "## Delivery plan", "");
+  f.milestones.forEach((m) => lines.push(`- **${m.stage}** (${m.window}): ${m.gate}`));
+  lines.push("", "## Risk register", "");
+  f.risks.forEach((r) => lines.push(`- **${r.risk}** — ${r.mitigation}`));
+  lines.push("", "## Benchmarks and sources", "");
+  f.facts.forEach((x) => lines.push(`- ${x.label}: ${x.value} — **${x.basis}** · ${x.source} (${x.year})`));
+  lines.push("", FACT_BASIS_NOTE, "", "_Indicative proposal. Budget lines are Atlas estimates benchmarked to the sources above and require EPC quotations before use._");
+  return { title: `Project Proposal — ${f.name}`, filename: "atlas-proposal-athi-river.md", markdown: lines.join("\n") };
+}

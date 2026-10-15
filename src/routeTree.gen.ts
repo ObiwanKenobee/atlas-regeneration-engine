@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as CapitalRouteImport } from './routes/capital'
 import { Route as DesignRouteImport } from './routes/design'
+import { Route as EastAfricaRouteImport } from './routes/east-africa'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as ObserveRouteImport } from './routes/observe'
@@ -37,6 +38,11 @@ const CapitalRoute = CapitalRouteImport.update({
 const DesignRoute = DesignRouteImport.update({
   id: '/design',
   path: '/design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EastAfricaRoute = EastAfricaRouteImport.update({
+  id: '/east-africa',
+  path: '/east-africa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
+  '/east-africa': typeof EastAfricaRoute
   '/explore': typeof ExploreRoute
   '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
+  '/east-africa': typeof EastAfricaRoute
   '/explore': typeof ExploreRoute
   '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/atlas': typeof AtlasRoute
   '/capital': typeof CapitalRoute
   '/design': typeof DesignRoute
+  '/east-africa': typeof EastAfricaRoute
   '/explore': typeof ExploreRoute
   '/impact': typeof ImpactRoute
   '/observe': typeof ObserveRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/capital'
     | '/design'
+    | '/east-africa'
     | '/explore'
     | '/impact'
     | '/observe'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/capital'
     | '/design'
+    | '/east-africa'
     | '/explore'
     | '/impact'
     | '/observe'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/capital'
     | '/design'
+    | '/east-africa'
     | '/explore'
     | '/impact'
     | '/observe'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AtlasRoute: typeof AtlasRoute
   CapitalRoute: typeof CapitalRoute
   DesignRoute: typeof DesignRoute
+  EastAfricaRoute: typeof EastAfricaRoute
   ExploreRoute: typeof ExploreRoute
   ImpactRoute: typeof ImpactRoute
   ObserveRoute: typeof ObserveRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/design'
       fullPath: '/design'
       preLoaderRoute: typeof DesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/east-africa': {
+      id: '/east-africa'
+      path: '/east-africa'
+      fullPath: '/east-africa'
+      preLoaderRoute: typeof EastAfricaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AtlasRoute: AtlasRoute,
   CapitalRoute: CapitalRoute,
   DesignRoute: DesignRoute,
+  EastAfricaRoute: EastAfricaRoute,
   ExploreRoute: ExploreRoute,
   ImpactRoute: ImpactRoute,
   ObserveRoute: ObserveRoute,
