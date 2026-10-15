@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/atlas/Shell";
-import { ActionButton, Chip, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
+import { ActionButton, Chip, Meter, Panel, ProvenanceTag, SectionTitle, Stat } from "@/components/atlas/ui";
 import { LIFECYCLE, OPPORTUNITIES, PLACE_BY_ID, PROJECTS, SYSTEM_BY_ID } from "@/lib/atlas/data";
-import { fmtNum, fmtUsdM } from "@/lib/atlas/model";
+import { fmtNum, fmtUsdM, stackAnalysis, type CapitalStack } from "@/lib/atlas/model";
+import { BasisChip, FactList } from "@/components/atlas/ui";
+import { CAPITAL_SOURCES } from "@/lib/atlas/data";
+import { FLAGSHIP } from "@/lib/atlas/flagship";
+import { INVESTMENT_PARTNERS, partnerFit } from "@/lib/atlas/partners";
+import { downloadReport, projectProposal } from "@/lib/atlas/report";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -47,6 +52,8 @@ function Projects() {
         title="From opportunity to infrastructure"
         sub="A project is an opportunity that has accepted its constraints."
       />
+
+      <FlagshipWalk />
 
       <Panel label="Project lifecycle" className="mb-4">
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -163,5 +170,155 @@ function Field({ label, body }: { label: string; body: string }) {
       <div className="label-xs text-primary">{label}</div>
       <p className="mt-1 leading-relaxed text-muted-foreground">{body}</p>
     </div>
+  );
+}
+
+const STEPS = ["1 · DESIGN", "2 · FINANCE", "3 · PROPOSAL"] as const;
+
+function FlagshipWalk() {
+  const f = FLAGSHIP;
+  const [step, setStep] = useState<(typeof STEPS)[number]>("1 · DESIGN");
+  const [partnerId, setPartnerId] = useState("norfund");
+  const [stack, setStack] = useState<CapitalStack>(f.stack);
+  const partner = INVESTMENT_PARTNERS.find((p) => p.id === partnerId)!;
+  const fit = partnerFit(partner, { capexUsdM: f.capexUsdM, placeName: "Nairobi", country: "Kenya", systems: ["energy", "Renewable"] });
+  const analysis = stackAnalysis(stack, f.capexUsdM);
+  const revenueUsdM = (f.annualGenerationGwh * 1e6 * f.tariffUsdPerKwh) / 1e6;
+  const savingsUsdM = (f.annualGenerationGwh * 1e6 * (f.dieselDisplacedUsdPerKwh - f.tariffUsdPerKwh)) / 1e6;
+
+  return (
+    <Panel label="Worked example · full lifecycle" className="mb-4" right={<span className="label-xs text-primary">NAIROBI · SOLAR + STORAGE</span>}>
+      <h3 className="font-display text-2xl tracking-tight">{f.name}</h3>
+      <p className="label-xs mt-0.5">{f.location}</p>
+      <p className="mt-2 max-w-3xl text-[13px] text-muted-foreground">{f.summary}</p>
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {STEPS.map((s) => (
+          <Chip key={s} active={s === step} onClick={() => setStep(s)}>{s}</Chip>
+        ))}
+      </div>
+
+      {step === "1 · DESIGN" && (
+        <div className="animate-rise mt-4 grid gap-4 lg:grid-cols-2">
+          <div>
+            <div className="label-xs text-primary">System design</div>
+            <ul className="mt-2 space-y-1.5 text-[13px]">
+              {f.designItems.map((d) => <li key={d.componentId} className="rounded-sm border border-border px-3 py-2">{d.label}</li>)}
+            </ul>
+            <div className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-3">
+              <Stat label="Capex" value={fmtUsdM(f.capexUsdM)} tone="primary" />
+              <Stat label="Generation" value={f.annualGenerationGwh} unit="GWh/yr" />
+              <Stat label="CO₂e avoided" value={fmtNum(f.co2AvoidedTpa)} unit="t/yr" tone="good" />
+              <Stat label="Offtakers" value={f.offtakers} />
+              <Stat label="Jobs" value={`${f.jobsConstruction} / ${f.jobsPermanent}`} hint="construction / permanent" />
+              <Stat label="Land" value={f.landHa} unit="ha" />
+            </div>
+            <p className="mt-3 text-[12px] text-muted-foreground"><span className="text-foreground">Why here — </span>{f.whyHere}</p>
+            <Link to="/design" search={{ place: "nairobi" }}><ActionButton variant="ghost" className="mt-3">OPEN IN DESIGN STUDIO</ActionButton></Link>
+          </div>
+          <div>
+            <div className="label-xs text-primary">Benchmarks behind the design</div>
+            <div className="mt-2"><FactList facts={f.facts} /></div>
+          </div>
+        </div>
+      )}
+
+      {step === "2 · FINANCE" && (
+        <div className="animate-rise mt-4 grid gap-4 lg:grid-cols-2">
+          <div>
+            <div className="label-xs text-primary">Lead investment partner</div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {INVESTMENT_PARTNERS.map((p) => (
+                <Chip key={p.id} active={p.id === partnerId} onClick={() => { setPartnerId(p.id); }}>{p.name.split(" — ")[0]}</Chip>
+              ))}
+            </div>
+            <p className="mt-3 text-[13px] text-muted-foreground">{partner.thesis}</p>
+            <ul className="mt-2 space-y-1 text-[12px] text-muted-foreground">
+              {fit.reasons.map((r) => <li key={r}>+ {r}</li>)}
+              {fit.frictions.map((r) => <li key={r} className="text-warn">− {r}</li>)}
+            </ul>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <ActionButton onClick={() => setStack({ ...fit.suggestedStack })}>APPLY PARTNER-LED STACK</ActionButton>
+              <ActionButton variant="ghost" onClick={() => setStack(f.stack)}>ATLAS RECOMMENDED STACK</ActionButton>
+            </div>
+          </div>
+          <div>
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+              <Stat label="Partner fit" value={fit.score} unit="/100" tone={fit.score >= 70 ? "good" : "warn"} />
+              <Stat label="Indicative ticket" value={fmtUsdM(fit.partnerShareUsdM)} tone="primary" />
+              <Stat label="Blended cost" value={`${analysis.blendedCost}%`} cite="capital.blendedCost" />
+              <Stat label="Annual service" value={fmtUsdM(analysis.annualDebtServiceUsdM)} cite="capital.annualService" />
+              <Stat label="PPA revenue" value={fmtUsdM(revenueUsdM)} unit="/yr" hint="Modeled" />
+              <Stat label="Offtaker savings" value={fmtUsdM(savingsUsdM)} unit="/yr" tone="good" hint="vs diesel-blended" />
+            </div>
+            <ul className="mt-4 space-y-1 text-[12px]">
+              {CAPITAL_SOURCES.filter((s) => (stack[s.id] ?? 0) > 0).map((s) => (
+                <li key={s.id} className="flex justify-between border-b border-border pb-1">
+                  <span>{s.label}</span>
+                  <span className="num">{stack[s.id]}% · {fmtUsdM(((stack[s.id] ?? 0) / Math.max(1, analysis.total)) * f.capexUsdM)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3"><Meter label="Feasibility" value={analysis.feasibility} color="var(--good)" cite="capital.feasibility" /></div>
+          </div>
+        </div>
+      )}
+
+      {step === "3 · PROPOSAL" && (
+        <div className="animate-rise mt-4 space-y-4">
+          <div>
+            <div className="label-xs text-primary">Budget · {fmtUsdM(f.capexUsdM)}</div>
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full text-[12px]">
+                <tbody>
+                  {f.budget.map((b) => (
+                    <tr key={b.item} className="border-b border-border">
+                      <td className="py-1.5 pr-3">{b.item}<div className="text-[11px] text-muted-foreground">{b.note}</div></td>
+                      <td className="num py-1.5 pr-3 text-right">{fmtUsdM(b.amountUsdM)}</td>
+                      <td className="num py-1.5 pr-3 text-right text-muted-foreground">{b.share}%</td>
+                      <td className="py-1.5 text-right"><BasisChip basis={b.basis} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div className="label-xs text-primary">Stakeholders</div>
+            <div className="mt-2 grid gap-2 md:grid-cols-2">
+              {f.stakeholders.map((s) => (
+                <div key={s.name} className="rounded-sm border border-border p-3 text-[12px]">
+                  <div className="flex justify-between gap-2"><span className="text-[13px]">{s.name}</span><span className="label-xs text-accent">{s.status}</span></div>
+                  <div className="label-xs mt-0.5">{s.role}</div>
+                  <p className="mt-1 text-muted-foreground">{s.interest}</p>
+                  <p className="mt-1"><span className="text-muted-foreground">Ask — </span>{s.commitment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <div className="label-xs text-primary">Delivery plan</div>
+              <ul className="mt-2 space-y-1 text-[12px] text-muted-foreground">
+                {f.milestones.map((m) => <li key={m.stage}><span className="text-foreground">{m.stage}</span> · {m.window} — {m.gate}</li>)}
+              </ul>
+            </div>
+            <div>
+              <div className="label-xs text-primary">Risk register</div>
+              <ul className="mt-2 space-y-1 text-[12px] text-muted-foreground">
+                {f.risks.map((r) => <li key={r.risk}><span className="text-foreground">{r.risk}</span> — {r.mitigation}</li>)}
+              </ul>
+            </div>
+          </div>
+          <ActionButton
+            variant="accent"
+            className="w-full"
+            onClick={() => downloadReport(projectProposal(f, stack, analysis, { name: partner.name, shareUsdM: fit.partnerShareUsdM, score: fit.score }))}
+          >
+            EXPORT PROJECT PROPOSAL
+          </ActionButton>
+          <p className="label-xs text-[9px]">Budget lines are Atlas estimates benchmarked to the cited sources; stakeholder statuses are illustrative planning states, not confirmed commitments.</p>
+        </div>
+      )}
+    </Panel>
   );
 }
